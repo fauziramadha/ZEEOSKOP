@@ -7,7 +7,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
-        /* SOLUSI iOS: Memastikan tinggi dasar HTML menyesuaikan layar yang tersedia */
         html { height: -webkit-fill-available; }
 
         body { 
@@ -15,7 +14,6 @@
             color: #c5c6c7; 
             display: flex; 
             flex-direction: column; 
-            /* SOLUSI iOS: Ganti 100vh dengan 100dvh dan fallback -webkit-fill-available */
             height: 100dvh; 
             min-height: -webkit-fill-available;
             overflow: hidden; 
@@ -29,7 +27,7 @@
         .video-area { width: 100%; aspect-ratio: 16 / 9; max-height: 60vh; display: flex; flex-direction: column; justify-content: center; position: relative; background-color: #000; z-index: 10; }
         .role-indicator { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.7); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; z-index: 20; color: #fff; }
 
-        .player-container { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
+        .player-container { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; background-color: #000; }
         .video-placeholder { color: #666; font-style: italic; }
 
         .controls-bar { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; align-items: center; gap: 15px; opacity: 0; transition: opacity 0.3s ease; z-index: 20; }
@@ -37,25 +35,16 @@
         .control-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; transition: color 0.2s ease; }
         .control-btn:hover { color: #45f3ff; }
         .progress-container { flex: 1; height: 5px; background: rgba(255, 255, 255, 0.2); border-radius: 5px; cursor: pointer; position: relative; }
-        .progress-filled { width: 30%; height: 100%; background: #45f3ff; border-radius: 5px; }
+        .progress-filled { width: 0%; height: 100%; background: #45f3ff; border-radius: 5px; }
 
         .sidebar { width: 100%; flex: 1; background-color: #1f2833; display: flex; flex-direction: column; border-top: 1px solid #2d3748; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 30; }
 
-        /* --- MODE FULLSCREEN --- */
         .main-container.is-fullscreen { flex-direction: row; }
         .main-container.is-fullscreen .video-area { height: 100%; max-height: none; aspect-ratio: auto; }
         .main-container.is-fullscreen .sidebar { width: 350px; position: absolute; right: 0; top: 0; height: 100%; background: rgba(11, 12, 16, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: none; border-left: 1px solid rgba(69, 243, 255, 0.2); transform: translateX(0); }
         .main-container.is-fullscreen .sidebar.chat-closed { transform: translateX(100%); }
 
-        /* --- SOLUSI iOS (Pseudo-Fullscreen) --- */
-        .main-container.is-pseudo-fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100dvh; /* Pastikan fullscreen darurat juga menggunakan dvh */
-            z-index: 9999;
-        }
+        .main-container.is-pseudo-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9999; }
 
         .user-list-section { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .section-title { font-size: 0.85rem; color: #45f3ff; margin-bottom: 10px; }
@@ -68,15 +57,7 @@
         .username { font-weight: bold; color: #45f3ff; margin-right: 5px; }
         .host-name { color: #ff4545; }
         
-        /* SOLUSI iOS: Jarak aman untuk Home Indicator di iPhone */
-        .chat-input-area { 
-            padding: 15px; 
-            padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
-            display: flex; 
-            gap: 10px; 
-            background: rgba(0,0,0,0.3); 
-        }
-        
+        .chat-input-area { padding: 15px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); display: flex; gap: 10px; background: rgba(0,0,0,0.3); }
         .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid #2d3748; color: #fff; padding: 10px; border-radius: 8px; outline: none; }
         .send-btn { background-color: #45f3ff; color: #0b0c10; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
@@ -94,26 +75,19 @@
     <div class="main-container" id="cinema-container">
         <div class="video-area">
             <div class="role-indicator">Mode: Penonton (Kontrol Dikunci)</div>
-            <div class="player-container">
-                <div class="player-container">
-    <!-- Tag Video Asli (Menggunakan video simulasi public domain) -->
-    <video id="main-video" src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" playsinline style="width: 100%; height: 100%; background: #000;"></video>
-    
-    <div class="controls-bar">
-        <!-- Tombol Play/Pause -->
-        <button class="control-btn" id="play-pause-btn">▶</button>
-        <div class="progress-container"><div class="progress-filled" id="progress-bar"></div></div>
-        <button class="control-btn" onclick="toggleFullScreen()" title="Layar Penuh">⛶</button>
-    </div>
-</div>
+            
+            <!-- Tombol Rahasia untuk testing Host -->
+            <div style="position: absolute; top: 15px; right: 15px; z-index: 20;">
+                <button id="test-host-btn" style="background: #ff4545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;">Klaim Host (Testing)</button>
+            </div>
 
-<!-- Tombol Rahasia untuk testing menjadi Host -->
-<div style="position: absolute; top: 15px; right: 15px; z-index: 20;">
-    <button id="test-host-btn" style="background: #ff4545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;">Klaim Host (Testing)</button>
-</div>
+            <div class="player-container">
+                <!-- Tag Video Utama -->
+                <video id="main-video" src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" playsinline style="width: 100%; height: 100%; background: #000;"></video>
+                
                 <div class="controls-bar">
-                    <button class="control-btn">▶</button>
-                    <div class="progress-container"><div class="progress-filled"></div></div>
+                    <button class="control-btn" id="play-pause-btn">▶</button>
+                    <div class="progress-container"><div class="progress-filled" id="progress-bar"></div></div>
                     <button class="control-btn" onclick="toggleFullScreen()" title="Layar Penuh">⛶</button>
                 </div>
             </div>
@@ -125,8 +99,7 @@
                 <div class="user-count"><span class="online-dot"></span> <span id="live-users-count">3 Pengguna Terhubung</span></div>
             </div>
             <div class="chat-section">
-                <div class="chat-messages">
-                </div>
+                <div class="chat-messages"></div>
                 <div class="chat-input-area">
                     <input type="text" class="chat-input" placeholder="Ketik pesan..."><button class="send-btn">Kirim</button>
                 </div>
@@ -190,10 +163,7 @@
             }
         }
 
-        let startX = 0;
-        let endX = 0;
-        const threshold = 50; 
-
+        let startX = 0; let endX = 0; const threshold = 50; 
         cinemaContainer.addEventListener('touchstart', e => { startX = e.changedTouches[0].screenX; });
         cinemaContainer.addEventListener('touchend', e => { endX = e.changedTouches[0].screenX; handleSwipe(); });
         cinemaContainer.addEventListener('mousedown', e => { startX = e.screenX; });
@@ -201,7 +171,6 @@
 
         function handleSwipe() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement && !cinemaContainer.classList.contains('is-pseudo-fullscreen')) return;
-
             if (endX < startX - threshold) {
                 sidebar.classList.remove('chat-closed');
             } else if (endX > startX + threshold) {
@@ -210,63 +179,134 @@
         }
     </script>
     
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    <!-- MENGAMBIL FIREBASE SDK MODERN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    async function initFirebase() {
-        try {
-            const response = await fetch('/api/config');
-            const firebaseConfig = await response.json();
+        let isHost = false; // Status default pengunjung
 
-            const app = initializeApp(firebaseConfig);
-            const db = getDatabase(app);
-            
-            console.log("Firebase Berhasil Terhubung!");
-            setupLiveChat(db);
+        async function initFirebase() {
+            try {
+                const response = await fetch('/api/config');
+                const firebaseConfig = await response.json();
 
-        } catch (error) {
-            console.error("Gagal memuat konfigurasi Firebase:", error);
-        }
-    }
+                const app = initializeApp(firebaseConfig);
+                const db = getDatabase(app);
+                
+                console.log("Firebase Berhasil Terhubung!");
+                setupLiveChat(db);
+                setupVideoSync(db);
 
-    function setupLiveChat(db) {
-        const roomID = document.getElementById('room-id-display').innerText;
-        const chatRef = ref(db, `rooms/${roomID}/chat`); 
-        
-        const chatBox = document.querySelector('.chat-messages');
-        const inputMsg = document.querySelector('.chat-input');
-        const sendBtn = document.querySelector('.send-btn');
-
-        function sendMessage() {
-            const text = inputMsg.value.trim();
-            if (text !== '') {
-                push(chatRef, {
-                    name: "Penonton",
-                    text: text,
-                    timestamp: Date.now()
-                });
-                inputMsg.value = ''; 
+            } catch (error) {
+                console.error("Gagal memuat konfigurasi Firebase:", error);
+                alert("API Key Firebase belum terhubung! Pastikan berjalan di Vercel.");
             }
         }
 
-        sendBtn.addEventListener('click', sendMessage);
-        inputMsg.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        onChildAdded(chatRef, (snapshot) => {
-            const data = snapshot.val();
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message';
-            msgDiv.innerHTML = `<span class="username">${data.name}:</span> ${data.text}`;
+        // --- LOGIKA VIDEO SINKRONISASI ---
+        function setupVideoSync(db) {
+            const roomID = document.getElementById('room-id-display').innerText;
+            const playerRef = ref(db, `rooms/${roomID}/player`);
             
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
-    }
+            const video = document.getElementById('main-video');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const roleIndicator = document.querySelector('.role-indicator');
+            const testHostBtn = document.getElementById('test-host-btn');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // 1. Klaim Host
+            testHostBtn.addEventListener('click', () => {
+                isHost = true;
+                roleIndicator.innerText = "Mode: HOST (Kendalikan Video)";
+                roleIndicator.style.background = "rgba(255, 69, 69, 0.8)";
+                testHostBtn.style.display = "none";
+            });
 
-    initFirebase();
-</script>
+            // 2. Kirim status Play/Pause ke Firebase
+            playPauseBtn.addEventListener('click', () => {
+                if (!isHost) {
+                    alert("Hanya Host yang bisa memutar atau menjeda video!");
+                    return;
+                }
+                if (video.paused) {
+                    set(playerRef, { state: 'playing', time: video.currentTime });
+                } else {
+                    set(playerRef, { state: 'paused', time: video.currentTime });
+                }
+            });
+
+            // 3. Update garis durasi (Progress Bar)
+            video.addEventListener('timeupdate', () => {
+                const percent = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = `${percent}%`;
+            });
+
+            // 4. Menerima instruksi dari Firebase ke semua perangkat
+            onValue(playerRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                // Sinkronisasi waktu jika meleset jauh
+                if (Math.abs(video.currentTime - data.time) > 2) {
+                    video.currentTime = data.time;
+                }
+
+                // Sinkronisasi status Play/Pause
+                if (data.state === 'playing') {
+                    video.play();
+                    playPauseBtn.innerText = '⏸';
+                } else {
+                    video.pause();
+                    playPauseBtn.innerText = '▶';
+                }
+            });
+        }
+
+        // --- LOGIKA LIVE CHAT ---
+        function setupLiveChat(db) {
+            const roomID = document.getElementById('room-id-display').innerText;
+            const chatRef = ref(db, `rooms/${roomID}/chat`); 
+            
+            const chatBox = document.querySelector('.chat-messages');
+            const inputMsg = document.querySelector('.chat-input');
+            const sendBtn = document.querySelector('.send-btn');
+
+            function sendMessage() {
+                const text = inputMsg.value.trim();
+                if (text !== '') {
+                    push(chatRef, {
+                        name: isHost ? "[Host] Admin" : "Penonton",
+                        text: text,
+                        timestamp: Date.now()
+                    });
+                    inputMsg.value = ''; 
+                }
+            }
+
+            sendBtn.addEventListener('click', sendMessage);
+            inputMsg.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            onChildAdded(chatRef, (snapshot) => {
+                const data = snapshot.val();
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                
+                if(data.name.includes("[Host]")) {
+                    msgDiv.innerHTML = `<span class="username host-name">${data.name}:</span> ${data.text}`;
+                } else {
+                    msgDiv.innerHTML = `<span class="username">${data.name}:</span> ${data.text}`;
+                }
+                
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        // Jalankan sistem
+        initFirebase();
+    </script>
 </body>
 </html>
