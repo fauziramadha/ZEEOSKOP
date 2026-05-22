@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEEOSKOP | Premium Watch Party</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #141414; color: #fff; overflow-x: hidden; }
+
+        /* --- NAVBAR --- */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
+        .menu-btn:hover { color: #d4af37; }
+
+        /* --- SIDEBAR MENU --- */
+        .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-menu.active { right: 0; }
+        .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
+        
+        .profile-card { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; transition: 0.3s; }
+        .profile-card:hover { opacity: 0.7; }
+        .profile-pic { width: 50px; height: 50px; background: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png') center/cover; border-radius: 4px; border: 1px solid #d4af37; }
+        .profile-info h4 { font-size: 1.1rem; color: #fff; }
+        .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
+
+        .menu-links { display: flex; flex-direction: column; gap: 15px; flex: 1; margin-bottom: 30px; }
+        .menu-links a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+        .menu-links a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; }
+        .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
+
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        /* --- HERO SECTION --- */
+        .hero { position: relative; width: 100vw; height: 85dvh; display: flex; align-items: flex-end; overflow: hidden; background-color: #000; }
+        .hero-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center top; opacity: 0; animation: kenburns 15s infinite linear; }
+        .slide:nth-child(1) { background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070'); animation-delay: 0s; }
+        .slide:nth-child(2) { background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2070'); animation-delay: 5s; }
+        .slide:nth-child(3) { background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=2070'); animation-delay: 10s; }
+
+        @keyframes kenburns { 0% { opacity: 0; transform: scale(1); } 10% { opacity: 1; } 33% { opacity: 1; transform: scale(1.05); } 43% { opacity: 0; } 100% { opacity: 0; transform: scale(1.1); } }
+
+        .hero::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(20,20,20,0.9) 0%, transparent 60%); z-index: 1; }
+        .hero::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, #141414 0%, transparent 100%); z-index: 1; }
+
+        .hero-content { position: relative; z-index: 2; padding: 0 4% 10% 4%; max-width: 800px; }
+        .hero-title { font-size: 4.5rem; font-weight: 900; margin-bottom: 10px; line-height: 1; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .hero-meta { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; font-weight: 600; color: #a3a3a3; font-size: 1rem; }
+        .meta-badge { border: 1px solid #a3a3a3; padding: 2px 6px; border-radius: 3px; font-size: 0.8rem; }
+        .meta-match { color: #46d369; font-weight: 800; } 
+        .hero-desc { font-size: 1.1rem; margin-bottom: 30px; line-height: 1.5; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); max-width: 600px; }
+
+        .btn-group { display: flex; gap: 10px; } 
+        .btn { padding: 10px 24px; font-size: 1rem; font-weight: 800; border-radius: 4px; border: none; cursor: pointer; text-align: center; transition: all 0.2s ease; }
+        .btn-play { background: #ffffff; color: #000000; }
+        .btn-play:hover { background: #dcdcdc; }
+        .btn-info { background: rgba(109, 109, 110, 0.7); color: #fff; }
+        .btn-info:hover { background: rgba(109, 109, 110, 0.5); }
+
+        /* --- ROWS / KATALOG --- */
+        .row-section { margin-top: -30px; position: relative; z-index: 3; padding: 0 4% 50px 4%; }
+        .row-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; color: #e5e5e5; }
+        .row-posters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+        .row-posters::-webkit-scrollbar { display: none; }
+        .poster { min-width: 160px; height: 240px; background-color: #222; border-radius: 5px; cursor: pointer; transition: transform 0.3s ease; background-size: cover; background-position: center; position: relative; }
+        .poster:hover { transform: scale(1.08); z-index: 10; border: 1px solid #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        .api-label { position: absolute; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #d4af37; padding: 5px; text-align: center; font-size: 0.8rem; font-weight: 800; border-radius: 3px; border: 1px solid #d4af37; }
+
+        /* --- FOOTER (KATEGORI RAPI) --- */
+        footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: 50px; border-top: 1px solid #222; }
+        .footer-call { margin-bottom: 30px; font-size: 1rem; }
+        .footer-call a { color: #737373; text-decoration: none; }
+        .footer-call a:hover { text-decoration: underline; }
+        
+        .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .footer-col h4 { color: #fff; margin-bottom: 15px; font-size: 1rem; font-weight: 600; }
+        .footer-col a { display: block; color: #737373; text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; }
+        .footer-col a:hover { text-decoration: underline; color: #fff; }
+        
+        .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
+
+        /* Modal Profil Khusus */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: rgba(0,0,0,0.85); padding: 50px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; text-align: center; }
+        .modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #777; font-size: 1.5rem; cursor: pointer; }
+        .form-input { width: 100%; background: #333; border: none; border-radius: 4px; padding: 15px; color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; }
+        .form-btn { width: 100%; background: #e50914; color: #fff; border: none; padding: 15px; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .edit-profile-pic { width: 100px; height: 100px; background: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png') center/cover; border-radius: 8px; margin: 0 auto 20px auto; border: 2px solid #d4af37; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.8rem; }
+            .poster { min-width: 130px; height: 195px; }
+            .btn-group { flex-wrap: nowrap; }
+            .btn { flex: 1; padding: 10px; font-size: 0.9rem; }
+            .footer-columns { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <header>
+        <div class="logo">ZEEOSKOP</div>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </header>
+
+    <!-- SIDEBAR MENU -->
+    <div class="sidebar-menu" id="sidebar-menu">
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+        
+        <div id="sidebar-profile-section"></div>
+
+        <!-- Menu Pendukung (Lebih Lengkap) -->
+        <div class="menu-links">
+            <a href="#">Beranda</a>
+            <a href="#">Kategori Film</a>
+            <a href="#">Film Favorit Saya</a>
+            <a href="#">Notifikasi Baru</a>
+            <a href="#">Paket Membership</a>
+            <a href="#">Pengaturan Akun</a>
+            <a href="#">Pusat Bantuan</a>
+        </div>
+        
+        <button class="auth-sidebar-btn" id="sidebar-auth-btn" onclick="handleAuthClick()">Masuk</button>
+    </div>
+
+    <section class="hero">
+        <div class="hero-slider">
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">NOBAR<br>PREMIUM</h1>
+            <div class="hero-meta">
+                <span class="meta-match">98% Match</span>
+                <span>2026</span>
+                <span class="meta-badge">4K HDR</span>
+                <span class="meta-badge">Real-Time Sync</span>
+            </div>
+            <p class="hero-desc">Bukan sekadar berbagi layar. Ciptakan ruang bioskop eksklusifmu, undang penonton, dan pegang kendali penuh atas tontonan.</p>
+            
+            <div class="btn-group">
+                <button class="btn btn-play" onclick="checkAuthAndAction('nobar')">Mulai Nobar</button>
+                <button class="btn btn-info" onclick="checkAuthAndAction('solo')">Nonton Sendiri</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="row-section">
+        <h2 class="row-title">Pilih Sumber Film</h2>
+        <div class="row-posters">
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');"><div class="api-label">SERVER 1 (VIP)</div></div>
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=600');"><div class="api-label">SERVER 2 (ASIA)</div></div>
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=600');"><div class="api-label">SERVER 3 (GLOBAL)</div></div>
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600');"><div class="api-label">SERVER 4 (ANIME)</div></div>
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=600');"><div class="api-label">YOUTUBE API</div></div>
+        </div>
+    </section>
+
+    <!-- FOOTER BARU (KOLOM TERPISAH) -->
+    <footer>
+        <div class="footer-call">Ada pertanyaan? Hubungi <a href="#">0800-1-ZEEOSKOP</a></div>
+        
+        <div class="footer-columns">
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="#">Beranda</a>
+                <a href="#">Kategori</a>
+                <a href="#">Cara Menonton</a>
+                <a href="#">Resolusi & Format</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Akun Saya</a>
+                <a href="#">Pusat Media</a>
+                <a href="#">Ketentuan Penggunaan</a>
+            </div>
+            <div class="footer-col">
+                <h4>Help Center</h4>
+                <a href="#">Tanya Jawab</a>
+                <a href="#">Pusat Bantuan</a>
+                <a href="#">Privasi Pengguna</a>
+                <a href="#">Hubungi Kami</a>
+            </div>
+        </div>
+        
+        <div class="footer-brand">ZEEOSKOP</div>
+    </footer>
+
+    <!-- MODAL EDIT PROFIL -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box text-center">
+            <button class="modal-close" onclick="closeModal('profile-modal')">×</button>
+            <h2 style="color: #fff; margin-bottom: 20px;">Edit Profil</h2>
+            <div class="edit-profile-pic"></div>
+            <input type="text" class="form-input" id="edit-name-input" placeholder="Nama Profil">
+            <button class="form-btn" style="background: #fff; color: #000;" onclick="saveProfile()">Simpan Perubahan</button>
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIKA CEK STATUS LOGIN DARI LOCALSTORAGE ---
+        let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
+        let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
+
+        function toggleMenu() {
+            document.getElementById('sidebar-menu').classList.toggle('active');
+            document.getElementById('menu-overlay').classList.toggle('active');
+            updateSidebarUI();
+        }
+
+        function updateSidebarUI() {
+            const profileSection = document.getElementById('sidebar-profile-section');
+            const authBtn = document.getElementById('sidebar-auth-btn');
+
+            if (isLoggedIn) {
+                profileSection.innerHTML = `
+                    <div class="profile-card" onclick="openProfileModal()">
+                        <div class="profile-pic"></div>
+                        <div class="profile-info">
+                            <h4 id="display-name">${userName}</h4>
+                            <span>★ VIP Member</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Keluar";
+                authBtn.className = "auth-sidebar-btn logout-btn";
+            } else {
+                profileSection.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-pic" style="opacity: 0.5;"></div>
+                        <div class="profile-info">
+                            <h4>Tamu</h4>
+                            <span style="color:#777;">Silakan masuk</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Masuk";
+                authBtn.className = "auth-sidebar-btn";
+            }
+        }
+
+        function handleAuthClick() {
+            if (isLoggedIn) {
+                // Logout (Hapus data dari memori browser)
+                localStorage.removeItem('zeeoskop_loggedIn');
+                localStorage.removeItem('zeeoskop_user');
+                location.reload(); // Refresh halaman
+            } else {
+                // Pindah ke halaman login.html
+                window.location.href = 'login.html';
+            }
+        }
+
+        function checkAuthAndAction(actionType) {
+            if (!isLoggedIn) {
+                // Paksa pindah ke login.html jika belum login
+                window.location.href = 'login.html';
+            } else {
+                if (actionType === 'nobar') {
+                    const newId = 'ZSKP-' + Math.floor(100 + Math.random() * 900);
+                    window.location.href = 'room.html?id=' + newId;
+                } else if (actionType === 'solo') {
+                    alert('Memuat pemutar video personal untuk ' + userName + '...');
+                }
+            }
+        }
+
+        // --- LOGIKA EDIT PROFIL ---
+        function openProfileModal() {
+            toggleMenu(); 
+            document.getElementById('edit-name-input').value = userName;
+            document.getElementById('profile-modal').classList.add('active');
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function saveProfile() {
+            const newName = document.getElementById('edit-name-input').value;
+            if(newName.trim() !== "") {
+                // Simpan nama baru ke memori browser
+                localStorage.setItem('zeeoskop_user', newName);
+                userName = newName;
+                closeModal('profile-modal');
+                updateSidebarUI(); // Perbarui tampilan nama di sidebar
+            }
+        }
+
+        // Jalankan update UI saat halaman dimuat
+        updateSidebarUI();
+    </script>
+</body>
+</html>
