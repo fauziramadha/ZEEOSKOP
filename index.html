@@ -183,5 +183,77 @@
             }
         }
     </script>
+    <!-- MENGAMBIL FIREBASE SDK MODERN -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    // 1. AMBIL KONFIGURASI DARI VERCEL API
+    async function initFirebase() {
+        try {
+            const response = await fetch('/api/config');
+            const firebaseConfig = await response.json();
+
+            // 2. INISIALISASI FIREBASE
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            
+            console.log("Firebase Berhasil Terhubung!");
+
+            // 3. JALANKAN LOGIKA LIVE CHAT
+            setupLiveChat(db);
+
+        } catch (error) {
+            console.error("Gagal memuat konfigurasi Firebase:", error);
+        }
+    }
+
+    // --- LOGIKA LIVE CHAT REAL-TIME ---
+    function setupLiveChat(db) {
+        const roomID = document.getElementById('room-id-display').innerText;
+        // Membuat jalur database khusus untuk room ini
+        const chatRef = ref(db, `rooms/${roomID}/chat`); 
+        
+        const chatBox = document.querySelector('.chat-messages');
+        const inputMsg = document.querySelector('.chat-input');
+        const sendBtn = document.querySelector('.send-btn');
+
+        // Fungsi Mengirim Pesan ke Database
+        function sendMessage() {
+            const text = inputMsg.value.trim();
+            if (text !== '') {
+                push(chatRef, {
+                    name: "Penonton", // (Sementara statis, nanti bisa diubah sesuai user login)
+                    text: text,
+                    timestamp: Date.now()
+                });
+                inputMsg.value = ''; // Kosongkan input setelah kirim
+            }
+        }
+
+        // Pemicu Kirim (Klik Tombol & Tekan Enter)
+        sendBtn.addEventListener('click', sendMessage);
+        inputMsg.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Fungsi Menerima Pesan Baru secara Real-time
+        onChildAdded(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            
+            // Buat elemen HTML baru untuk pesan
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            msgDiv.innerHTML = `<span class="username">${data.name}:</span> ${data.text}`;
+            
+            // Tambahkan ke layar dan otomatis scroll ke bawah
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    }
+
+    // Mulai Sistem
+    initFirebase();
+</script>
 </body>
 </html>
