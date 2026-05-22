@@ -6,7 +6,20 @@
     <title>ZEEOSKOP - Premium Watch Party</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #0b0c10; color: #c5c6c7; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* SOLUSI iOS: Memastikan tinggi dasar HTML menyesuaikan layar yang tersedia */
+        html { height: -webkit-fill-available; }
+
+        body { 
+            background-color: #0b0c10; 
+            color: #c5c6c7; 
+            display: flex; 
+            flex-direction: column; 
+            /* SOLUSI iOS: Ganti 100vh dengan 100dvh dan fallback -webkit-fill-available */
+            height: 100dvh; 
+            min-height: -webkit-fill-available;
+            overflow: hidden; 
+        }
 
         header { background-color: #1f2833; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #45f3ff33; }
         header h1 { font-size: 1.5rem; color: #45f3ff; font-weight: 800; letter-spacing: 2px; }
@@ -40,7 +53,7 @@
             top: 0;
             left: 0;
             width: 100vw;
-            height: 100vh;
+            height: 100dvh; /* Pastikan fullscreen darurat juga menggunakan dvh */
             z-index: 9999;
         }
 
@@ -55,7 +68,15 @@
         .username { font-weight: bold; color: #45f3ff; margin-right: 5px; }
         .host-name { color: #ff4545; }
         
-        .chat-input-area { padding: 15px; display: flex; gap: 10px; background: rgba(0,0,0,0.3); }
+        /* SOLUSI iOS: Jarak aman untuk Home Indicator di iPhone */
+        .chat-input-area { 
+            padding: 15px; 
+            padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
+            display: flex; 
+            gap: 10px; 
+            background: rgba(0,0,0,0.3); 
+        }
+        
         .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid #2d3748; color: #fff; padding: 10px; border-radius: 8px; outline: none; }
         .send-btn { background-color: #45f3ff; color: #0b0c10; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
@@ -112,14 +133,11 @@
         const header = document.getElementById('top-header');
         const sidebar = document.getElementById('chat-sidebar');
 
-        // LOGIKA FULLSCREEN YANG DIPERBARUI (Anti-Blokir)
         function toggleFullScreen() {
-            // Cek apakah browser mendukung fitur Fullscreen murni
             const canFullscreen = cinemaContainer.requestFullscreen || cinemaContainer.webkitRequestFullscreen;
             const isCurrentlyFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
 
             if (canFullscreen) {
-                // Jalur Normal (Laptop / Android)
                 if (!isCurrentlyFullscreen) {
                     if (cinemaContainer.requestFullscreen) cinemaContainer.requestFullscreen();
                     else if (cinemaContainer.webkitRequestFullscreen) cinemaContainer.webkitRequestFullscreen();
@@ -128,16 +146,13 @@
                     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
                 }
             } else {
-                // Jalur Darurat iOS (Pseudo-Fullscreen)
                 cinemaContainer.classList.toggle('is-pseudo-fullscreen');
                 
                 if (cinemaContainer.classList.contains('is-pseudo-fullscreen')) {
-                    // Masuk Mode Penuh
                     cinemaContainer.classList.add('is-fullscreen');
                     header.style.display = 'none';
                     sidebar.classList.remove('chat-closed');
                 } else {
-                    // Keluar Mode Penuh
                     cinemaContainer.classList.remove('is-fullscreen');
                     header.style.display = 'flex';
                     sidebar.classList.remove('chat-closed');
@@ -145,7 +160,6 @@
             }
         }
 
-        // Event listener bawaan browser untuk mendeteksi layar penuh asli
         document.addEventListener('fullscreenchange', handleFullscreenChange);
         document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
 
@@ -171,34 +185,29 @@
         cinemaContainer.addEventListener('mouseup', e => { endX = e.screenX; handleSwipe(); });
 
         function handleSwipe() {
-            // Aktifkan swipe baik di Fullscreen asli maupun Pseudo-Fullscreen
             if (!document.fullscreenElement && !document.webkitFullscreenElement && !cinemaContainer.classList.contains('is-pseudo-fullscreen')) return;
 
             if (endX < startX - threshold) {
-                sidebar.classList.remove('chat-closed'); // Buka
+                sidebar.classList.remove('chat-closed');
             } else if (endX > startX + threshold) {
-                sidebar.classList.add('chat-closed'); // Tutup
+                sidebar.classList.add('chat-closed');
             }
         }
     </script>
-    <!-- MENGAMBIL FIREBASE SDK MODERN -->
+    
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    // 1. AMBIL KONFIGURASI DARI VERCEL API
     async function initFirebase() {
         try {
             const response = await fetch('/api/config');
             const firebaseConfig = await response.json();
 
-            // 2. INISIALISASI FIREBASE
             const app = initializeApp(firebaseConfig);
             const db = getDatabase(app);
             
             console.log("Firebase Berhasil Terhubung!");
-
-            // 3. JALANKAN LOGIKA LIVE CHAT
             setupLiveChat(db);
 
         } catch (error) {
@@ -206,51 +215,42 @@
         }
     }
 
-    // --- LOGIKA LIVE CHAT REAL-TIME ---
     function setupLiveChat(db) {
         const roomID = document.getElementById('room-id-display').innerText;
-        // Membuat jalur database khusus untuk room ini
         const chatRef = ref(db, `rooms/${roomID}/chat`); 
         
         const chatBox = document.querySelector('.chat-messages');
         const inputMsg = document.querySelector('.chat-input');
         const sendBtn = document.querySelector('.send-btn');
 
-        // Fungsi Mengirim Pesan ke Database
         function sendMessage() {
             const text = inputMsg.value.trim();
             if (text !== '') {
                 push(chatRef, {
-                    name: "Penonton", // (Sementara statis, nanti bisa diubah sesuai user login)
+                    name: "Penonton",
                     text: text,
                     timestamp: Date.now()
                 });
-                inputMsg.value = ''; // Kosongkan input setelah kirim
+                inputMsg.value = ''; 
             }
         }
 
-        // Pemicu Kirim (Klik Tombol & Tekan Enter)
         sendBtn.addEventListener('click', sendMessage);
         inputMsg.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Fungsi Menerima Pesan Baru secara Real-time
         onChildAdded(chatRef, (snapshot) => {
             const data = snapshot.val();
-            
-            // Buat elemen HTML baru untuk pesan
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message';
             msgDiv.innerHTML = `<span class="username">${data.name}:</span> ${data.text}`;
             
-            // Tambahkan ke layar dan otomatis scroll ke bawah
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
     }
 
-    // Mulai Sistem
     initFirebase();
 </script>
 </body>
