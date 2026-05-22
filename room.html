@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEEOSKOP - Premium Watch Party</title>
+    <title>ZEEOSKOP - Ruang Nobar Premium</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        /* Import Font Mewah */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
         
+        /* SOLUSI iOS */
         html { height: -webkit-fill-available; }
 
         body { 
-            background-color: #0b0c10; 
-            color: #c5c6c7; 
+            background-color: #141414; /* Hitam khas Netflix */
+            color: #fff; 
             display: flex; 
             flex-direction: column; 
             height: 100dvh; 
@@ -19,94 +23,152 @@
             overflow: hidden; 
         }
 
-        header { background-color: #1f2833; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #45f3ff33; }
-        header h1 { font-size: 1.5rem; color: #45f3ff; font-weight: 800; letter-spacing: 2px; }
-        .room-badge { background-color: #0b0c10; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; border: 1px solid #45f3ff; cursor: pointer; transition: all 0.3s ease; user-select: none; }
+        /* --- HEADER PREMIUM --- */
+        header { 
+            background-color: #000; 
+            padding: 15px 4%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #333; 
+            z-index: 100;
+        }
         
+        header h1 { font-size: 1.5rem; color: #d4af37; font-weight: 900; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        
+        .room-badge { 
+            background-color: rgba(255, 255, 255, 0.1); 
+            padding: 8px 15px; 
+            border-radius: 4px; 
+            font-size: 0.85rem; 
+            border: 1px solid #333; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-weight: 600;
+            color: #ccc;
+        }
+        .room-badge:hover { background-color: #d4af37; color: #000; border-color: #d4af37; }
+
+        /* --- LAYOUT UTAMA --- */
         .main-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; background-color: #000; }
-        .video-area { width: 100%; aspect-ratio: 16 / 9; max-height: 60vh; display: flex; flex-direction: column; justify-content: center; position: relative; background-color: #000; z-index: 10; }
-        .role-indicator { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.7); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; z-index: 20; color: #fff; }
+        .video-area { width: 100%; aspect-ratio: 16 / 9; max-height: 65vh; display: flex; flex-direction: column; justify-content: center; position: relative; background-color: #000; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        
+        .role-indicator { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0, 0, 0, 0.8); padding: 6px 12px; 
+            border-radius: 4px; font-size: 0.75rem; font-weight: bold; 
+            z-index: 20; color: #fff; border: 1px solid #333; backdrop-filter: blur(5px);
+        }
 
+        /* --- PEMUTAR VIDEO & KONTROL NETFLIX STYLE --- */
         .player-container { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; background-color: #000; }
-        .video-placeholder { color: #666; font-style: italic; }
-
-        .controls-bar { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px 20px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); display: flex; align-items: center; gap: 15px; opacity: 0; transition: opacity 0.3s ease; z-index: 20; }
+        
+        .controls-bar { 
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 4%; 
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); 
+            display: flex; align-items: center; gap: 20px; opacity: 0; transition: opacity 0.4s ease; z-index: 20; 
+        }
         .player-container:hover .controls-bar { opacity: 1; }
-        .control-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; transition: color 0.2s ease; }
-        .control-btn:hover { color: #45f3ff; }
-        .progress-container { flex: 1; height: 5px; background: rgba(255, 255, 255, 0.2); border-radius: 5px; cursor: pointer; position: relative; }
-        .progress-filled { width: 0%; height: 100%; background: #45f3ff; border-radius: 5px; }
+        
+        .control-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .control-btn:hover { color: #d4af37; transform: scale(1.1); }
+        
+        /* Garis Durasi Video */
+        .progress-container { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.2); border-radius: 3px; cursor: pointer; position: relative; transition: height 0.2s; }
+        .progress-container:hover { height: 8px; }
+        .progress-filled { width: 0%; height: 100%; background: #d4af37; border-radius: 3px; position: relative; }
+        /* Titik merah/emas di ujung garis durasi */
+        .progress-filled::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none; }
+        .progress-container:hover .progress-filled::after { display: block; }
 
-        .sidebar { width: 100%; flex: 1; background-color: #1f2833; display: flex; flex-direction: column; border-top: 1px solid #2d3748; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 30; }
+        /* --- SIDEBAR CHAT (BAWAH SAAT NORMAL, KANAN SAAT FULLSCREEN) --- */
+        .sidebar { width: 100%; flex: 1; background-color: #141414; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 30; }
 
+        /* Mode Fullscreen / Pseudo Fullscreen */
         .main-container.is-fullscreen { flex-direction: row; }
         .main-container.is-fullscreen .video-area { height: 100%; max-height: none; aspect-ratio: auto; }
-        .main-container.is-fullscreen .sidebar { width: 350px; position: absolute; right: 0; top: 0; height: 100%; background: rgba(11, 12, 16, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: none; border-left: 1px solid rgba(69, 243, 255, 0.2); transform: translateX(0); }
+        .main-container.is-fullscreen .sidebar { 
+            width: 350px; position: absolute; right: 0; top: 0; height: 100%; 
+            background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
+            border-left: 1px solid rgba(255,255,255,0.05); transform: translateX(0); 
+        }
         .main-container.is-fullscreen .sidebar.chat-closed { transform: translateX(100%); }
 
+        /* Pseudo-fullscreen iOS */
         .main-container.is-pseudo-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9999; }
 
-        .user-list-section { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .section-title { font-size: 0.85rem; color: #45f3ff; margin-bottom: 10px; }
-        .user-count { font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
-        .online-dot { width: 8px; height: 8px; background-color: #00ffcc; border-radius: 50%; }
+        /* Elemen Chat Premium */
+        .user-list-section { padding: 15px 20px; border-bottom: 1px solid #222; background: #0a0a0a; }
+        .section-title { font-size: 0.75rem; color: #777; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        .user-count { font-size: 0.9rem; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .online-dot { width: 8px; height: 8px; background-color: #46d369; border-radius: 50%; box-shadow: 0 0 8px #46d369; }
         
         .chat-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .message { font-size: 0.9rem; line-height: 1.4; }
-        .username { font-weight: bold; color: #45f3ff; margin-right: 5px; }
-        .host-name { color: #ff4545; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { font-size: 0.9rem; line-height: 1.5; color: #ccc; }
+        .username { font-weight: bold; color: #fff; margin-right: 5px; font-size: 0.85rem; }
+        .host-name { color: #d4af37; }
         
-        .chat-input-area { padding: 15px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); display: flex; gap: 10px; background: rgba(0,0,0,0.3); }
-        .chat-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid #2d3748; color: #fff; padding: 10px; border-radius: 8px; outline: none; }
-        .send-btn { background-color: #45f3ff; color: #0b0c10; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .chat-input-area { padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); display: flex; gap: 10px; background: #0a0a0a; border-top: 1px solid #222; }
+        .chat-input { flex: 1; background: #222; border: 1px solid #333; color: #fff; padding: 12px 15px; border-radius: 4px; outline: none; font-size: 0.9rem; transition: 0.3s; }
+        .chat-input:focus { border-color: #d4af37; background: #1a1a1a; }
+        .send-btn { background-color: #fff; color: #000; border: none; padding: 0 20px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .send-btn:hover { background: #dcdcdc; }
+
+        /* Tombol Host Testing */
+        .test-host-btn { background: #e50914; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(229, 9, 20, 0.4); }
+        .test-host-btn:hover { background: #f40612; }
     </style>
 </head>
 <body>
 
     <header id="top-header">
-        <h1>ZEEOSKOP</h1>
+        <div class="logo">ZEEOSKOP</div>
         <div class="room-badge" onclick="copyRoomID()">
-            ID ROOM: <span id="room-id-display">ZSKP-998</span>
-            <span id="copy-status" style="display:none; color:#00ffcc; margin-left:5px;">(Tersalin!)</span>
+            ROOM: <span id="room-id-display">ZSKP-998</span>
+            <span id="copy-status" style="display:none; color:#46d369; margin-left:5px;">(Tersalin!)</span>
         </div>
     </header>
 
     <div class="main-container" id="cinema-container">
+        <!-- AREA VIDEO -->
         <div class="video-area">
-            <div class="role-indicator">Mode: Penonton (Kontrol Dikunci)</div>
+            <div class="role-indicator">Mode: Penonton (Terkunci)</div>
             
-            <!-- Tombol Rahasia untuk testing Host -->
-            <div style="position: absolute; top: 15px; right: 15px; z-index: 20;">
-                <button id="test-host-btn" style="background: #ff4545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer;">Klaim Host (Testing)</button>
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 20;">
+                <button id="test-host-btn" class="test-host-btn">Klaim Host</button>
             </div>
 
             <div class="player-container">
-                <!-- Tag Video Utama -->
                 <video id="main-video" src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" playsinline style="width: 100%; height: 100%; background: #000;"></video>
                 
                 <div class="controls-bar">
-                    <button class="control-btn" id="play-pause-btn">▶</button>
-                    <div class="progress-container"><div class="progress-filled" id="progress-bar"></div></div>
+                    <button class="control-btn" id="play-pause-btn" title="Play/Pause">▶</button>
+                    <!-- GARIS DURASI -->
+                    <div class="progress-container" id="progress-bar-container">
+                        <div class="progress-filled" id="progress-bar"></div>
+                    </div>
                     <button class="control-btn" onclick="toggleFullScreen()" title="Layar Penuh">⛶</button>
                 </div>
             </div>
         </div>
 
+        <!-- AREA CHAT -->
         <div class="sidebar" id="chat-sidebar">
             <div class="user-list-section">
-                <div class="section-title">Penonton</div>
-                <div class="user-count"><span class="online-dot"></span> <span id="live-users-count">3 Pengguna Terhubung</span></div>
+                <div class="section-title">Status Ruangan</div>
+                <div class="user-count"><span class="online-dot"></span> <span id="live-users-count">Sesi Live Aktif</span></div>
             </div>
             <div class="chat-section">
                 <div class="chat-messages"></div>
                 <div class="chat-input-area">
-                    <input type="text" class="chat-input" placeholder="Ketik pesan..."><button class="send-btn">Kirim</button>
+                    <input type="text" class="chat-input" placeholder="Tulis pesan..."><button class="send-btn">Kirim</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPT UI & FULLSCREEN -->
     <script>
         function copyRoomID() {
             const roomID = document.getElementById('room-id-display').innerText;
@@ -135,7 +197,6 @@
                 }
             } else {
                 cinemaContainer.classList.toggle('is-pseudo-fullscreen');
-                
                 if (cinemaContainer.classList.contains('is-pseudo-fullscreen')) {
                     cinemaContainer.classList.add('is-fullscreen');
                     header.style.display = 'none';
@@ -163,6 +224,7 @@
             }
         }
 
+        // SWIPE CHAT LOGIC (Kiri/Kanan)
         let startX = 0; let endX = 0; const threshold = 50; 
         cinemaContainer.addEventListener('touchstart', e => { startX = e.changedTouches[0].screenX; });
         cinemaContainer.addEventListener('touchend', e => { endX = e.changedTouches[0].screenX; handleSwipe(); });
@@ -171,40 +233,35 @@
 
         function handleSwipe() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement && !cinemaContainer.classList.contains('is-pseudo-fullscreen')) return;
-            if (endX < startX - threshold) {
-                sidebar.classList.remove('chat-closed');
-            } else if (endX > startX + threshold) {
-                sidebar.classList.add('chat-closed');
-            }
+            if (endX < startX - threshold) { sidebar.classList.remove('chat-closed'); } 
+            else if (endX > startX + threshold) { sidebar.classList.add('chat-closed'); }
         }
     </script>
     
-    <!-- MENGAMBIL FIREBASE SDK MODERN -->
+    <!-- MENGAMBIL FIREBASE SDK MODERN & LOGIKA SINKRONISASI -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        let isHost = false; // Status default pengunjung
+        let isHost = false; 
+        // Mengambil nama user dari sistem Login sebelumnya (jika ada)
+        let userName = localStorage.getItem('zeeoskop_user') || 'Penonton';
 
         async function initFirebase() {
             try {
                 const response = await fetch('/api/config');
                 const firebaseConfig = await response.json();
-
                 const app = initializeApp(firebaseConfig);
                 const db = getDatabase(app);
                 
-                console.log("Firebase Berhasil Terhubung!");
                 setupLiveChat(db);
                 setupVideoSync(db);
-
             } catch (error) {
-                console.error("Gagal memuat konfigurasi Firebase:", error);
-                alert("API Key Firebase belum terhubung! Pastikan berjalan di Vercel.");
+                console.error("Gagal memuat API Vercel:", error);
             }
         }
 
-        // --- LOGIKA VIDEO SINKRONISASI ---
+        // --- LOGIKA VIDEO SINKRONISASI & SCRUBBING ---
         function setupVideoSync(db) {
             const roomID = document.getElementById('room-id-display').innerText;
             const playerRef = ref(db, `rooms/${roomID}/player`);
@@ -214,21 +271,22 @@
             const roleIndicator = document.querySelector('.role-indicator');
             const testHostBtn = document.getElementById('test-host-btn');
             const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-bar-container');
             
             // 1. Klaim Host
             testHostBtn.addEventListener('click', () => {
                 isHost = true;
+                userName = "[Host] " + userName;
                 roleIndicator.innerText = "Mode: HOST (Kendalikan Video)";
-                roleIndicator.style.background = "rgba(255, 69, 69, 0.8)";
+                roleIndicator.style.background = "rgba(212, 175, 55, 0.9)"; // Warna Emas
+                roleIndicator.style.color = "#000";
                 testHostBtn.style.display = "none";
             });
 
-            // 2. Kirim status Play/Pause ke Firebase
+            // 2. Tombol Play/Pause
             playPauseBtn.addEventListener('click', () => {
-                if (!isHost) {
-                    alert("Hanya Host yang bisa memutar atau menjeda video!");
-                    return;
-                }
+                if (!isHost) { alert("Hanya Host yang bisa memutar/menjeda video!"); return; }
+                
                 if (video.paused) {
                     set(playerRef, { state: 'playing', time: video.currentTime });
                 } else {
@@ -236,23 +294,35 @@
                 }
             });
 
-            // 3. Update garis durasi (Progress Bar)
+            // 3. FITUR SCRUBBING (GESER DURASI)
+            progressContainer.addEventListener('click', (e) => {
+                if (!isHost) { alert("Hanya Host yang bisa menggeser durasi film!"); return; }
+
+                const rect = progressContainer.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const newTime = (clickX / rect.width) * video.duration;
+                
+                // Ubah durasi langsung di layar Host & Kirim ke Firebase
+                video.currentTime = newTime;
+                set(playerRef, { state: video.paused ? 'paused' : 'playing', time: newTime });
+            });
+
+            // 4. Update UI Garis Durasi saat video berjalan
             video.addEventListener('timeupdate', () => {
                 const percent = (video.currentTime / video.duration) * 100;
                 progressBar.style.width = `${percent}%`;
             });
 
-            // 4. Menerima instruksi dari Firebase ke semua perangkat
+            // 5. Menerima instruksi dari Firebase (Untuk Semua Perangkat)
             onValue(playerRef, (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
 
-                // Sinkronisasi waktu jika meleset jauh
+                // Sensor Koreksi Waktu (Lompat otomatis jika selisih lebih dari 2 detik)
                 if (Math.abs(video.currentTime - data.time) > 2) {
                     video.currentTime = data.time;
                 }
 
-                // Sinkronisasi status Play/Pause
                 if (data.state === 'playing') {
                     video.play();
                     playPauseBtn.innerText = '⏸';
@@ -275,29 +345,24 @@
             function sendMessage() {
                 const text = inputMsg.value.trim();
                 if (text !== '') {
-                    push(chatRef, {
-                        name: isHost ? "[Host] Admin" : "Penonton",
-                        text: text,
-                        timestamp: Date.now()
-                    });
+                    push(chatRef, { name: userName, text: text, timestamp: Date.now() });
                     inputMsg.value = ''; 
                 }
             }
 
             sendBtn.addEventListener('click', sendMessage);
-            inputMsg.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
+            inputMsg.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
             onChildAdded(chatRef, (snapshot) => {
                 const data = snapshot.val();
                 const msgDiv = document.createElement('div');
                 msgDiv.className = 'message';
                 
+                // Format spesial jika yang mengirim adalah Host
                 if(data.name.includes("[Host]")) {
                     msgDiv.innerHTML = `<span class="username host-name">${data.name}:</span> ${data.text}`;
                 } else {
-                    msgDiv.innerHTML = `<span class="username">${data.name}:</span> ${data.text}`;
+                    msgDiv.innerHTML = `<span class="username">${data.name}:</span> <span style="color: #eee;">${data.text}</span>`;
                 }
                 
                 chatBox.appendChild(msgDiv);
@@ -305,7 +370,7 @@
             });
         }
 
-        // Jalankan sistem
+        // Jalankan aplikasi
         initFirebase();
     </script>
 </body>
