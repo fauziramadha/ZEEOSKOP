@@ -16,7 +16,7 @@
         .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
         .menu-btn:hover { color: #d4af37; }
 
-        /* --- SIDEBAR MENU --- */
+        /* --- SIDEBAR MENU & ACCORDION --- */
         .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
         .sidebar-menu.active { right: 0; }
         .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
@@ -26,11 +26,19 @@
         .profile-info h4 { font-size: 1.1rem; color: #fff; }
         .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
 
-        .menu-links { display: flex; flex-direction: column; gap: 15px; flex: 1; margin-bottom: 30px; }
-        .menu-links a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .menu-links a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
+        .menu-links a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: flex-start; }
+        .menu-links > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
         
-        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; }
+        /* CSS Khusus Accordion Menu */
+        .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
+        .accordion-content.active { display: flex; }
+        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; }
+        .accordion-content a:hover { color: #fff; border-left: 2px solid #e50914; padding-left: 15px; background: transparent; }
+        .arrow-icon { margin-left: auto; font-size: 0.8rem; transition: transform 0.3s; }
+        .arrow-icon.rotate { transform: rotate(180deg); color: #d4af37; }
+        
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; margin-top: 20px;}
         .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
 
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
@@ -54,7 +62,7 @@
         .form-input { width: 100%; background: #333; border: none; border-radius: 4px; padding: 15px; color: #fff; font-size: 1rem; outline: none; transition: background 0.2s; }
         .form-input:focus { background: #444; border-bottom: 2px solid #d4af37; }
 
-        /* Area Film Terpilih (Awalnya Sembunyi) */
+        /* Area Film Terpilih */
         .selected-movie-box {
             display: none; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.5); 
             padding: 15px; border-radius: 6px; margin-bottom: 25px;
@@ -102,7 +110,7 @@
         .footer-col a:hover { text-decoration: underline; color: #fff; }
         .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
 
-        /* --- MODAL PERINGATAN (NETFLIX STYLE) --- */
+        /* --- MODAL PERINGATAN --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-overlay.active { display: flex; }
         .modal-box { background: rgba(20,20,20,0.95); border: 1px solid #333; padding: 40px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
@@ -116,7 +124,7 @@
             .footer-columns { grid-template-columns: repeat(2, 1fr); }
             .nobar-grid { padding: 0 4%; gap: 20px; }
             .nobar-card { padding: 30px 20px; }
-            .btn-flex-group { flex-direction: column; } /* Tombol jadi atas bawah di layar sangat kecil */
+            .btn-flex-group { flex-direction: column; } 
         }
     </style>
 </head>
@@ -129,17 +137,42 @@
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
     </header>
 
-    <!-- SIDEBAR MENU KHUSUS SESSIN NOBAR -->
+    <!-- SIDEBAR MENU DENGAN ACCORDION -->
     <div class="sidebar-menu" id="sidebar-menu">
         <button class="close-btn" onclick="toggleMenu()">×</button>
         
         <div id="sidebar-profile-section"></div>
 
         <div class="menu-links">
-            <a href="index.html">Kembali ke Beranda</a>
-            <a href="#">Panduan Sinkronisasi</a>
-            <a href="#">Status Server Sync</a>
-            <a href="#">Riwayat Kamar Sesi</a>
+            <a href="index.html">Beranda</a>
+            
+            <!-- ACCORDION KATEGORI FILM -->
+            <div class="accordion-item">
+                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;">
+                    Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
+                </a>
+                
+                <div class="accordion-content" id="kategori-dropdown">
+                    <a href="#" onclick="alert('Memuat Daftar Genre...'); return false;">Genre</a>
+                    <a href="#" onclick="alert('Memuat Daftar Negara...'); return false;">Negara</a>
+                    <a href="#" onclick="alert('Memuat Daftar Tahun...'); return false;">Tahun</a>
+                    
+                    <!-- SUB-ACCORDION: JELAJAHI -->
+                    <a href="#" onclick="toggleAccordion('jelajahi-dropdown', 'icon-jelajahi'); return false;" style="color: #fff; font-weight: bold; margin-top: 5px;">
+                        Jelajahi <span class="arrow-icon" id="icon-jelajahi">▼</span>
+                    </a>
+                    
+                    <div class="accordion-content" id="jelajahi-dropdown" style="border-left: 1px solid #444; margin-left: 10px;">
+                        <a href="#">Terpopuler</a>
+                        <a href="#">Rating Tertinggi</a>
+                        <a href="#">Rekomendasi</a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="favorit.html">Film Favorit Saya</a>
+            <a href="update.html">Notifikasi Baru</a>
+            <a href="vip.html">Paket Membership</a>
             <a href="bantuan.html">Pusat Bantuan</a>
         </div>
         
@@ -158,16 +191,15 @@
                     <h3>Buat Ruangan</h3>
                     <p>Ciptakan ruang sinema privat baru. Pilih film dari katalog premium kami, dapatkan kode undangan, dan mulai menonton bersama.</p>
                     
-                    <!-- Kotak Film Terpilih (Awalnya disembunyikan lewat CSS) -->
                     <div class="selected-movie-box" id="movie-status-box">
                         <div class="label">Siap Diputar:</div>
                         <div class="title" id="movie-status-title">Judul Film</div>
                     </div>
                 </div>
                 
-                <!-- Grup Tombol Bersebelahan -->
                 <div class="btn-flex-group">
-                    <button class="btn btn-glass" id="btn-sumber-film" onclick="window.location.href='film.html'">Sumber Film</button>
+                    <!-- LINK MENUJU KE FILM.HTML DENGAN PARAMETER MODE=NOBAR -->
+                    <button class="btn btn-glass" id="btn-sumber-film" onclick="window.location.href='film.html?mode=nobar'">Sumber Film</button>
                     <button class="btn btn-red" onclick="generateNewRoom()">Mulai Sesi Baru</button>
                 </div>
             </div>
@@ -186,29 +218,29 @@
 
         </div>
 
-        <!-- SECTION 3: CAROUSEL PILIH SUMBER FILM -->
+        <!-- SECTION 3: CAROUSEL PILIH SUMBER FILM (Mode Nobar) -->
         <section class="row-section">
             <h2 class="row-title">Pilih Sumber Film</h2>
             <div class="row-posters">
-                <div class="poster" onclick="window.location.href='film.html'" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
+                <div class="poster" onclick="window.location.href='film.html?mode=nobar'" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
                     <div class="poster-overlay"><span class="play-icon">▶</span><span class="poster-title">SERVER VIP</span></div>
                 </div>
-                <div class="poster" onclick="window.location.href='film.html'" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=600');">
+                <div class="poster" onclick="window.location.href='film.html?mode=nobar'" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=600');">
                     <div class="poster-overlay"><span class="play-icon">▶</span><span class="poster-title">SERVER ASIA</span></div>
                 </div>
-                <div class="poster" onclick="window.location.href='film.html'" style="background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=600');">
+                <div class="poster" onclick="window.location.href='film.html?mode=nobar'" style="background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=600');">
                     <div class="poster-overlay"><span class="play-icon">▶</span><span class="poster-title">SERVER GLOBAL</span></div>
                 </div>
-                <div class="poster" onclick="window.location.href='film.html'" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600');">
+                <div class="poster" onclick="window.location.href='film.html?mode=nobar'" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600');">
                     <div class="poster-overlay"><span class="play-icon">▶</span><span class="poster-title">SERVER ANIME</span></div>
                 </div>
-                <div class="poster" onclick="window.location.href='film.html'" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=600');">
+                <div class="poster" onclick="window.location.href='film.html?mode=nobar'" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=600');">
                     <div class="poster-overlay"><span class="play-icon">▶</span><span class="poster-title">YOUTUBE API</span></div>
                 </div>
             </div>
 
             <div class="btn-more-container">
-                <button class="btn-more" onclick="window.location.href='film.html'">Selengkapnya</button>
+                <button class="btn-more" onclick="window.location.href='film.html?mode=nobar'">Selengkapnya</button>
             </div>
         </section>
 
@@ -251,23 +283,19 @@
             <p style="color: #a3a3a3; margin-bottom: 20px; line-height: 1.6; font-size: 0.95rem;">
                 Anda belum memilih tontonan untuk ruangan ini. Silakan kunjungi pustaka Sumber Film kami terlebih dahulu untuk memilih film yang ingin ditonton bersama.
             </p>
-            <button class="form-btn-modal" onclick="window.location.href='film.html'">Pilih Film Sekarang</button>
+            <button class="form-btn-modal" onclick="window.location.href='film.html?mode=nobar'">Pilih Film Sekarang</button>
         </div>
     </div>
 
     <!-- LOGIKA CORE DASHBOARD -->
     <script>
-        // Ambil status login dari memori browser
         let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
         let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
 
-        // SISTEM PROTEKSI: Jika belum login, paksa tendang ke login.html
         if (!isLoggedIn) {
             window.location.href = 'login.html';
         }
 
-        // --- SISTEM PENGECEKAN FILM TERPILIH DARI FILM.HTML ---
-        // (Nanti di film.html, saat user klik film, kita simpan judulnya di localStorage)
         let selectedMovieTitle = localStorage.getItem('zeeoskop_selected_movie_title');
         
         function initMovieStatus() {
@@ -276,18 +304,23 @@
             const btnSumber = document.getElementById('btn-sumber-film');
 
             if (selectedMovieTitle) {
-                // Jika sudah ada film yang dipilih
                 statusBox.style.display = 'block';
                 titleDisplay.innerText = selectedMovieTitle;
-                btnSumber.innerText = 'Ganti Film'; // Ubah teks tombol
+                btnSumber.innerText = 'Ganti Film'; 
             } else {
-                // Jika belum ada
                 statusBox.style.display = 'none';
                 btnSumber.innerText = 'Sumber Film';
             }
         }
 
-        // Kontrol Menu Samping
+        // --- LOGIKA ACCORDION MENU ---
+        function toggleAccordion(dropdownId, iconId) {
+            const dropdown = document.getElementById(dropdownId);
+            const icon = document.getElementById(iconId);
+            dropdown.classList.toggle('active');
+            icon.classList.toggle('rotate');
+        }
+
         function toggleMenu() {
             document.getElementById('sidebar-menu').classList.toggle('active');
             document.getElementById('menu-overlay').classList.toggle('active');
@@ -321,29 +354,20 @@
             }
         }
 
-        // --- MODAL CONTROLLERS ---
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // LOGIKA INPUT 1: GENERATE ROOM BARU
         function generateNewRoom() {
-            // Cek apakah pengguna sudah memilih film atau belum
             if (!selectedMovieTitle) {
-                openModal('alert-movie-modal'); // Munculkan peringatan gaya Netflix
+                openModal('alert-movie-modal'); 
                 return;
             }
 
-            // Jika sudah ada film, membuat ID kamar acak
             const generatedId = 'ZSKP-' + Math.floor(100 + Math.random() * 900);
-            
-            // Hapus cache film agar saat bikin kamar lagi harus milih ulang
             localStorage.removeItem('zeeoskop_selected_movie_title');
-
-            // Langsung dilempar ke room.html membawa parameter ID
             window.location.href = `room.html?id=${generatedId}`;
         }
 
-        // LOGIKA INPUT 2: GABUNG ROOM YANG SUDAH ADA
         function joinRoomByField() {
             const roomIdField = document.getElementById('input-room-id').value.trim();
             if (roomIdField === "") {
@@ -353,7 +377,6 @@
             window.location.href = `room.html?id=${roomIdField}`;
         }
 
-        // Jalankan UI pembuka
         updateSidebarUI();
         initMovieStatus();
     </script>
