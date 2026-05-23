@@ -1,1 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEEOSKOP | Pusat Bantuan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #141414; color: #fff; overflow-x: hidden; min-height: 100dvh; display: flex; flex-direction: column; }
+
+        /* --- HEADER IDENTIK --- */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-decoration: none; }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
+        .menu-btn:hover { color: #d4af37; }
+
+        /* --- SIDEBAR MENU & ACCORDION IDENTIK --- */
+        .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-menu.active { right: 0; }
+        .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
+        
+        .profile-card { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; }
+        .profile-pic { width: 50px; height: 50px; background: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png') center/cover; border-radius: 4px; border: 1px solid #d4af37; }
+        .profile-info h4 { font-size: 1.1rem; color: #fff; }
+        .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
+
+        .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
+        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        
+        .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
+        .accordion-content.active { display: flex; }
+        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; text-decoration: none; display: block; transition: 0.2s; }
+        .accordion-content a:hover { color: #fff; border-left: 2px solid #e50914; padding-left: 15px; background: transparent; }
+        .arrow-icon { margin-left: auto; font-size: 0.8rem; transition: transform 0.3s; }
+        .arrow-icon.rotate { transform: rotate(180deg); color: #d4af37; }
+
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; margin-top: 20px;}
+        .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
+
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        /* --- WRAPPER CONTENT & HERO HELP CENTER --- */
+        .content-wrapper { padding-top: 100px; flex: 1; display: flex; flex-direction: column; align-items: center; padding-bottom: 60px; }
+        
+        .help-hero { width: 100%; background: #0a0a0a; padding: 60px 4% 50px 4%; text-align: center; border-bottom: 1px solid #222; margin-bottom: 40px; }
+        .help-hero h1 { font-size: 2.5rem; font-weight: 900; color: #fff; margin-bottom: 15px; }
+        .help-hero p { font-size: 1.1rem; color: #a3a3a3; margin-bottom: 30px; }
+        
+        .search-container { max-width: 600px; width: 100%; margin: 0 auto; position: relative; }
+        .search-box { width: 100%; background: #fff; border: none; border-radius: 4px; padding: 18px 20px; color: #000; font-size: 1.1rem; outline: none; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .search-box::placeholder { color: #666; font-weight: 400; }
+        .search-box:focus { box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.5); }
+
+        /* --- FAQ SECTION --- */
+        .faq-container { width: 100%; max-width: 800px; padding: 0 4%; }
+        .faq-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 25px; border-left: 4px solid #e50914; padding-left: 12px; }
+
+        .faq-item { background: #1a1a1a; margin-bottom: 15px; border-radius: 4px; border: 1px solid #333; overflow: hidden; transition: 0.3s; }
+        .faq-item:hover { border-color: #555; }
+        
+        .faq-question { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 1.1rem; font-weight: 600; color: #fff; background: transparent; border: none; width: 100%; text-align: left; }
+        .faq-question:hover { background: rgba(255,255,255,0.05); }
+        
+        .faq-icon { font-size: 1.5rem; transition: transform 0.3s ease; color: #d4af37; font-weight: normal; }
+        .faq-item.active .faq-icon { transform: rotate(45deg); color: #e50914; }
+        
+        .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; background: #111; color: #ccc; line-height: 1.6; font-size: 0.95rem; }
+        .faq-item.active .faq-answer { padding: 0 20px 20px 20px; max-height: 500px; /* Cukup besar untuk menampung teks */ }
+
+        /* --- CONTACT SUPPORT --- */
+        .contact-box { width: 100%; max-width: 800px; margin: 50px auto 0 auto; background: linear-gradient(to right, #111, #0a0a0a); border: 1px solid #333; padding: 40px; border-radius: 8px; text-align: center; }
+        .contact-box h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; color: #d4af37; }
+        .contact-box p { color: #a3a3a3; margin-bottom: 20px; font-size: 0.95rem; }
+        .btn-contact { background: #fff; color: #000; padding: 12px 30px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-contact:hover { background: #dcdcdc; }
+
+        /* --- FOOTER IDENTIK --- */
+        footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: auto; border-top: 1px solid #222; background-color: #141414; }
+        .footer-call { margin-bottom: 30px; font-size: 1rem; }
+        .footer-call a { color: #737373; text-decoration: none; }
+        .footer-call a:hover { text-decoration: underline; }
+        .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .footer-col h4 { color: #fff; margin-bottom: 15px; font-size: 1rem; font-weight: 600; }
+        .footer-col a { display: block; color: #737373; text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; }
+        .footer-col a:hover { text-decoration: underline; color: #fff; }
+        .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            .help-hero h1 { font-size: 2rem; }
+            .footer-columns { grid-template-columns: repeat(2, 1fr); }
+            .faq-question { font-size: 1rem; padding: 15px; }
+            .contact-box { padding: 30px 20px; border-radius: 0; border-left: none; border-right: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <header>
+        <a href="index.html" class="logo">ZEEOSKOP</a>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </header>
+
+    <!-- SIDEBAR MENU IDENTIK -->
+    <div class="sidebar-menu" id="sidebar-menu">
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+        <div id="sidebar-profile-section"></div>
+        
+        <div class="menu-links">
+            <a href="index.html">Beranda</a>
+            
+            <div class="accordion-item">
+                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;">
+                    Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
+                </a>
+                <div class="accordion-content" id="kategori-dropdown">
+                    <a href="#">Genre</a>
+                    <a href="#">Negara</a>
+                    <a href="#">Tahun</a>
+                    
+                    <a href="#" onclick="toggleAccordion('jelajahi-dropdown', 'icon-jelajahi'); return false;" style="color: #fff; font-weight: bold; margin-top: 5px;">
+                        Jelajahi <span class="arrow-icon" id="icon-jelajahi">▼</span>
+                    </a>
+                    <div class="accordion-content" id="jelajahi-dropdown" style="border-left: 1px solid #444; margin-left: 10px;">
+                        <a href="#">Terpopuler</a>
+                        <a href="#">Rating Tertinggi</a>
+                        <a href="#">Rekomendasi</a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="favorit.html">Film Favorit Saya</a>
+            <a href="update.html">Notifikasi Baru</a>
+            <a href="vip.html">Paket Membership</a>
+            
+            <!-- Penanda Menu Aktif -->
+            <a href="bantuan.html" style="color: #fff; border-left: 3px solid #d4af37; background: rgba(255,255,255,0.1); padding-left: 20px;">Pusat Bantuan</a>
+        </div>
+        
+        <button class="auth-sidebar-btn" id="sidebar-auth-btn" onclick="handleAuthClick()">Masuk</button>
+    </div>
+
+    <!-- WRAPPER CONTENT -->
+    <div class="content-wrapper">
+        
+        <!-- HERO HELP CENTER -->
+        <div class="help-hero">
+            <h1>Halo, ada yang bisa kami bantu?</h1>
+            <p>Temukan jawaban untuk pengaturan nobar, sinkronisasi video, dan pengelolaan akun.</p>
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Ketik kendala Anda di sini (misal: 'sinkronisasi error')...">
+            </div>
+        </div>
+
+        <!-- FAQ SECTION -->
+        <div class="faq-container">
+            <h2 class="faq-title">Topik Populer</h2>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Bagaimana cara memulai sesi Nobar? 
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <br>
+                    Untuk memulai nobar, buka menu <strong>Kategori Film</strong>, klik judul film yang Anda inginkan, lalu pilih <strong>Mulai Sesi Baru</strong>. Setelah berada di dalam Ruang Tunggu (Lobby), Anda akan mendapatkan tautan dan ID Room unik. Salin tautan tersebut dan bagikan ke teman Anda.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Kenapa video teman saya tertinggal (Delay)?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <br>
+                    ZEEOSKOP menggunakan algoritma Auto-Sync. Jika video penonton tertinggal lebih dari 2 detik karena koneksi internet mereka yang melambat, sistem kami akan secara otomatis menarik paksa (*force-sync*) durasi video mereka ke detik yang sama dengan perangkat Host. Pastikan jaringan internet semua pihak stabil.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Apakah saya harus berlangganan untuk menonton?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <br>
+                    Tidak. Kami menyediakan paket <strong>Basic (Gratis)</strong> di mana Anda tetap bisa menonton dan membuat ruang nobar untuk maksimal 3 orang dengan resolusi standar. Namun, jika Anda menginginkan pengalaman tanpa iklan dan kualitas 4K HDR, Anda bisa melakukan peningkatan ke paket <strong>VIP Premium</strong>.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Siapa yang memegang kendali (Play/Pause) di dalam Room?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <br>
+                    Secara *default*, hanya orang yang membuat ruangan tersebut (Host) yang memiliki kendali penuh untuk memutar video, menghentikan sementara, atau menggeser durasi. Penonton biasa akan mendapati kontrol mereka dikunci agar sesi tontonan tetap sinkron.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Bagaimana cara memutar film dari link pihak ketiga (Custom URL)?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer">
+                    <br>
+                    Jika Anda memiliki link format video mentah (seperti `.mp4` atau `.m3u8`), Anda dapat memasukkannya di halaman <strong>Dashboard Nobar</strong> pada kolom "Buat Ruangan". Video tersebut akan diputar dan disinkronkan ke semua teman di ruangan Anda.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CONTACT BOX -->
+        <div class="contact-box">
+            <h3>Masih kesulitan menemukan jawaban?</h3>
+            <p>Tim dukungan teknis kami bersiaga 24/7 untuk membantu masalah sesi premium Anda.</p>
+            <button class="btn-contact">Hubungi Live Chat</button>
+        </div>
+
+    </div>
+
+    <!-- FOOTER IDENTIK -->
+    <footer>
+        <div class="footer-call">Ada pertanyaan? Hubungi <a href="#">0800-1-ZEEOSKOP</a></div>
+        <div class="footer-columns">
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="index.html">Beranda</a>
+                <a href="film.html">Kategori Film</a>
+                <a href="#">Cara Menonton</a>
+                <a href="#">Resolusi & Format</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Akun Saya</a>
+                <a href="#">Pusat Media</a>
+                <a href="#">Ketentuan Penggunaan</a>
+            </div>
+            <div class="footer-col">
+                <h4>Help Center</h4>
+                <a href="#">Tanya Jawab</a>
+                <a href="bantuan.html">Pusat Bantuan</a>
+                <a href="#">Privasi Pengguna</a>
+                <a href="#">Hubungi Kami</a>
+            </div>
+        </div>
+        <div class="footer-brand">ZEEOSKOP</div>
+    </footer>
+
+    <!-- LOGIKA JAVASCRIPT UTAMA -->
+    <script>
+        let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
+        let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
+
+        // --- FUNGSI FAQ ACCORDION ---
+        function toggleFaq(button) {
+            const faqItem = button.parentElement;
+            
+            // Opsional: Tutup item lain jika ingin model satu-buka
+            const allItems = document.querySelectorAll('.faq-item');
+            allItems.forEach(item => {
+                if(item !== faqItem && item.classList.contains('active')) {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Buka/Tutup item yang diklik
+            faqItem.classList.toggle('active');
+        }
+
+        // --- LOGIKA ACCORDION MENU SIDEBAR ---
+        function toggleAccordion(dropdownId, iconId) {
+            const dropdown = document.getElementById(dropdownId);
+            const icon = document.getElementById(iconId);
+            dropdown.classList.toggle('active');
+            icon.classList.toggle('rotate');
+        }
+
+        // --- KONTROL SIDEBAR & AUTH ---
+        function toggleMenu() {
+            document.getElementById('sidebar-menu').classList.toggle('active');
+            document.getElementById('menu-overlay').classList.toggle('active');
+            updateSidebarUI();
+        }
+
+        function updateSidebarUI() {
+            const profileSection = document.getElementById('sidebar-profile-section');
+            const authBtn = document.getElementById('sidebar-auth-btn');
+
+            if (isLoggedIn) {
+                profileSection.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-pic"></div>
+                        <div class="profile-info">
+                            <h4>${userName}</h4>
+                            <span>★ VIP Member</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Keluar";
+                authBtn.className = "auth-sidebar-btn logout-btn";
+            } else {
+                profileSection.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-pic" style="opacity: 0.5;"></div>
+                        <div class="profile-info">
+                            <h4>Tamu</h4>
+                            <span style="color:#777;">Silakan masuk</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Masuk";
+                authBtn.className = "auth-sidebar-btn";
+            }
+        }
+
+        function handleAuthClick() {
+            if (isLoggedIn) {
+                localStorage.removeItem('zeeoskop_loggedIn');
+                localStorage.removeItem('zeeoskop_user');
+                location.reload();
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+
+        updateSidebarUI();
+    </script>
+</body>
+</html>
