@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEEOSKOP | Katalog Film Premium</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #141414; color: #fff; overflow-x: hidden; min-height: 100dvh; display: flex; flex-direction: column; }
+
+        /* --- HEADER IDENTIK --- */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
+        .menu-btn:hover { color: #d4af37; }
+
+        /* --- SIDEBAR MENU IDENTIK --- */
+        .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-menu.active { right: 0; }
+        .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
+        
+        .profile-card { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; }
+        .profile-pic { width: 50px; height: 50px; background: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png') center/cover; border-radius: 4px; border: 1px solid #d4af37; }
+        .profile-info h4 { font-size: 1.1rem; color: #fff; }
+        .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
+
+        .menu-links { display: flex; flex-direction: column; gap: 15px; flex: 1; margin-bottom: 30px; }
+        .menu-links a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+        .menu-links a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; }
+        .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
+
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        /* --- WRAPPER CONTENT & SEARCH AREA --- */
+        .content-wrapper { padding-top: 120px; flex: 1; display: flex; flex-direction: column; }
+
+        .search-container { padding: 0 4% 30px 4%; max-width: 600px; width: 100%; }
+        .search-box { width: 100%; background: #222; border: 1px solid #444; border-radius: 4px; padding: 15px 20px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; }
+        .search-box:focus { background: #141414; border-color: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+
+        /* --- ROWS / KATALOG NETFLIX STYLE --- */
+        .row-section { padding: 0 4% 40px 4%; }
+        .row-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; color: #fff; border-left: 4px solid #e50914; padding-left: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .row-posters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+        .row-posters::-webkit-scrollbar { display: none; }
+        
+        .poster { 
+            min-width: 160px; height: 240px; background-color: #222; border-radius: 4px; 
+            cursor: pointer; transition: transform 0.3s ease; background-size: cover; 
+            background-position: center; position: relative; overflow: hidden;
+        }
+        .poster:hover { transform: scale(1.06); z-index: 10; border: 1px solid #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        
+        /* Overlay Muncul Saat Hover Poster */
+        .poster-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease; padding: 0 10px 20px 10px; text-align: center;
+        }
+        .poster:hover .poster-overlay { opacity: 1; }
+        
+        .play-icon { font-size: 2.2rem; color: #d4af37; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .poster-title { font-size: 0.85rem; font-weight: 800; color: #fff; letter-spacing: 0.5px; line-height: 1.2; }
+        .poster-meta { font-size: 0.7rem; color: #46d369; font-weight: bold; margin-top: 4px; }
+
+        /* --- FOOTER IDENTIK --- */
+        footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: auto; border-top: 1px solid #222; background-color: #141414; }
+        .footer-call { margin-bottom: 30px; font-size: 1rem; }
+        .footer-call a { color: #737373; text-decoration: none; }
+        .footer-call a:hover { text-decoration: underline; }
+        .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .footer-col h4 { color: #fff; margin-bottom: 15px; font-size: 1rem; font-weight: 600; }
+        .footer-col a { display: block; color: #737373; text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; }
+        .footer-col a:hover { text-decoration: underline; color: #fff; }
+        .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            .poster { min-width: 130px; height: 195px; }
+            .footer-columns { grid-template-columns: repeat(2, 1fr); }
+            .search-container { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <header>
+        <div class="logo">ZEEOSKOP</div>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </header>
+
+    <div class="sidebar-menu" id="sidebar-menu">
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+        <div id="sidebar-profile-section"></div>
+        <div class="menu-links">
+            <a href="index.html">Beranda</a>
+            <a href="film.html">Kategori Film</a>
+            <a href="favorit.html">Film Favorit Saya</a>
+            <a href="update.html">Notifikasi Baru</a>
+            <a href="vip.html">Paket Membership</a>
+            <a href="bantuan.html">Pusat Bantuan</a>
+        </div>
+        <button class="auth-sidebar-btn" id="sidebar-auth-btn" onclick="handleAuthClick()">Masuk</button>
+    </div>
+
+    <div class="content-wrapper">
+        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Cari judul film, genre, atau server...">
+        </div>
+
+        <section class="row-section">
+            <h2 class="row-title">SERVER 1 (VIP MOVIE)</h2>
+            <div class="row-posters">
+                <div class="poster" onclick="selectMovieAndRedirect('Avenger: Secret Wars')" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
+                    <div class="poster-overlay">
+                        <span class="play-icon">▶</span><span class="poster-title">Avenger: Secret Wars</span>
+                        <span class="poster-meta">98% COCOK</span>
+                    </div>
+                </div>
+                <div class="poster" onclick="selectMovieAndRedirect('Avatar: The Deep Ocean')" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600');">
+                    <div class="poster-overlay">
+                        <span class="play-icon">▶</span><span class="poster-title">Avatar: The Deep Ocean</span>
+                        <span class="poster-meta">95% COCOK</span>
+                    </div>
+                </div>
+                <div class="poster" onclick="selectMovieAndRedirect('Interstellar V2')" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600');">
+                    <div class="poster-overlay">
+                        <span class="play-icon">▶</span><span class="poster-title">Interstellar V2</span>
+                        <span class="poster-meta">99% COCOK</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="row-section">
+            <h2 class="row-title">SERVER 2 (ASIA & DRAMA)</h2>
+            <div class="row-posters">
+                <div class="poster" onclick="selectMovieAndRedirect('The Raid 3: Redemption')" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600');">
+                    <div class="poster-overlay">
+                        <span class="play-icon">▶</span><span class="poster-title">The Raid 3: Redemption</span>
+                        <span class="poster-meta">92% COCOK</span>
+                    </div>
+                </div>
+                <div class="poster" onclick="selectMovieAndRedirect('Cyberpunk Neo Tokyo')" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600');">
+                    <div class="poster-overlay">
+                        <span class="play-icon">▶</span><span class="poster-title">Cyberpunk Neo Tokyo</span>
+                        <span class="poster-meta">89% COCOK</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="footer-call">Ada pertanyaan? Hubungi <a href="#">0800-1-ZEEOSKOP</a></div>
+        <div class="footer-columns">
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="index.html">Beranda</a>
+                <a href="film.html">Kategori Film</a>
+                <a href="#">Cara Menonton</a>
+                <a href="#">Resolusi & Format</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Akun Saya</a>
+                <a href="#">Pusat Media</a>
+                <a href="#">Ketentuan Penggunaan</a>
+            </div>
+            <div class="footer-col">
+                <h4>Help Center</h4>
+                <a href="#">Tanya Jawab</a>
+                <a href="bantuan.html">Pusat Bantuan</a>
+                <a href="#">Privasi Pengguna</a>
+                <a href="#">Hubungi Kami</a>
+            </div>
+        </div>
+        <div class="footer-brand">ZEEOSKOP</div>
+    </footer>
+
+    <script>
+        let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
+        let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
+
+        // PROTEKSI: Belum login tidak bisa masuk katalog penuh
+        if (!isLoggedIn) {
+            window.location.href = 'login.html';
+        }
+
+        // --- CORE FUNCTION: PILIH FILM ---
+        function selectMovieAndRedirect(movieTitle) {
+            // 1. Simpan judul film terpilih ke memori lokal browser
+            localStorage.setItem('zeeoskop_selected_movie_title', movieTitle);
+            
+            // 2. Tampilkan status sukses kecil lewat alert (opsional)
+            alert(`Film "${movieTitle}" berhasil dipilih! Dialihkan kembali ke Ruang Sesi...`);
+            
+            // 3. Lempar otomatis balik ke nobar.html
+            window.location.href = 'nobar.html';
+        }
+
+        // Kontrol Menu Samping
+        function toggleMenu() {
+            document.getElementById('sidebar-menu').classList.toggle('active');
+            document.getElementById('menu-overlay').classList.toggle('active');
+            updateSidebarUI();
+        }
+
+        function updateSidebarUI() {
+            const profileSection = document.getElementById('sidebar-profile-section');
+            const authBtn = document.getElementById('sidebar-auth-btn');
+
+            if (isLoggedIn) {
+                profileSection.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-pic"></div>
+                        <div class="profile-info">
+                            <h4>${userName}</h4>
+                            <span>★ VIP Member</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Keluar";
+                authBtn.className = "auth-sidebar-btn logout-btn";
+            }
+        }
+
+        function handleAuthClick() {
+            if (isLoggedIn) {
+                localStorage.removeItem('zeeoskop_loggedIn');
+                localStorage.removeItem('zeeoskop_user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        updateSidebarUI();
+    </script>
+</body>
+</html>
