@@ -12,11 +12,11 @@
 
         /* --- HEADER --- */
         header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); }
-        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-decoration: none; }
+        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-decoration: none;}
         .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
         .menu-btn:hover { color: #d4af37; }
 
-        /* --- SIDEBAR MENU --- */
+        /* --- SIDEBAR MENU & ACCORDION --- */
         .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
         .sidebar-menu.active { right: 0; }
         .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
@@ -27,7 +27,7 @@
         .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
 
         .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
-        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; cursor: pointer; }
+        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: flex-start; cursor: pointer; }
         .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
         
         .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
@@ -43,16 +43,18 @@
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
         .menu-overlay.active { display: block; opacity: 1; }
 
-        /* --- SEARCH AREA --- */
+        /* --- WRAPPER CONTENT & SEARCH AREA --- */
         .content-wrapper { padding-top: 100px; flex: 1; display: flex; flex-direction: column; }
+
         .search-container { padding: 0 4% 30px 4%; max-width: 600px; width: 100%; }
         .search-box { width: 100%; background: #222; border: 1px solid #444; border-radius: 4px; padding: 15px 20px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; }
         .search-box:focus { background: #141414; border-color: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
 
-        /* --- KATALOG ROW --- */
+        /* --- ROWS / KATALOG NETFLIX STYLE --- */
         .row-section { padding: 0 4% 40px 4%; }
         .row-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; color: #fff; border-left: 4px solid #e50914; padding-left: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .row-posters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; align-items: center; }
+        
+        .row-posters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; min-height: 250px; align-items: center; }
         .row-posters::-webkit-scrollbar { display: none; }
         
         .poster { min-width: 160px; height: 240px; background-color: #222; border-radius: 4px; cursor: pointer; transition: transform 0.3s ease; background-size: cover; background-position: center; position: relative; overflow: hidden; }
@@ -64,14 +66,18 @@
         .play-icon { font-size: 2.2rem; color: #d4af37; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
         .poster-title { font-size: 0.85rem; font-weight: 800; color: #fff; letter-spacing: 0.5px; line-height: 1.2; }
         .poster-meta { font-size: 0.7rem; color: #46d369; font-weight: bold; margin-top: 4px; }
+        
+        .loading-text { color: #888; font-size: 0.9rem; font-style: italic; width: 100%; text-align: left; padding: 20px; }
 
         /* --- FOOTER --- */
         footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: auto; border-top: 1px solid #222; background-color: #141414; }
         .footer-call { margin-bottom: 30px; font-size: 1rem; }
         .footer-call a { color: #737373; text-decoration: none; }
+        .footer-call a:hover { text-decoration: underline; }
         .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
         .footer-col h4 { color: #fff; margin-bottom: 15px; font-size: 1rem; font-weight: 600; }
         .footer-col a { display: block; color: #737373; text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; }
+        .footer-col a:hover { text-decoration: underline; color: #fff; }
         .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
 
         @media (max-width: 768px) {
@@ -126,67 +132,22 @@
 
     <div class="content-wrapper">
         <div class="search-container">
-            <input type="text" class="search-box" placeholder="Cari judul film (Membutuhkan API TMDB Pribadi)..." disabled style="opacity: 0.5; cursor: not-allowed;">
+            <input type="text" class="search-box" id="searchInput" placeholder="Cari judul film (Tekan Enter)..." onkeyup="searchMovies(event)">
         </div>
 
         <section class="row-section">
-            <h2 class="row-title">SERVER 1 (BOX OFFICE)</h2>
-            <div class="row-posters">
-                <div class="poster" onclick="handleMovieClick('Deadpool & Wolverine', '533535')" style="background-image: url('https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span>
-                        <span class="poster-title">Deadpool & Wolverine</span>
-                        <span class="poster-meta">99% COCOK</span>
-                    </div>
-                </div>
-                
-                <div class="poster" onclick="handleMovieClick('Avengers: Endgame', '299534')" style="background-image: url('https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span>
-                        <span class="poster-title">Avengers: Endgame</span>
-                        <span class="poster-meta">98% COCOK</span>
-                    </div>
-                </div>
-
-                <div class="poster" onclick="handleMovieClick('Interstellar', '157336')" style="background-image: url('https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MvrIdZ2O.jpg');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span>
-                        <span class="poster-title">Interstellar</span>
-                        <span class="poster-meta">97% COCOK</span>
-                    </div>
-                </div>
-
-                <div class="poster" onclick="handleMovieClick('Avatar: The Way of Water', '76600')" style="background-image: url('https://image.tmdb.org/t/p/w500/t6HIqrNDIGGLtivpAezq1Io00A3.jpg');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span>
-                        <span class="poster-title">Avatar: The Way of Water</span>
-                        <span class="poster-meta">95% COCOK</span>
-                    </div>
-                </div>
+            <h2 class="row-title" id="title-popular">FILM POPULER SAAT INI</h2>
+            <div class="row-posters" id="row-popular">
+                <div class="loading-text">Sedang menyinkronkan data...</div>
             </div>
         </section>
 
         <section class="row-section">
-            <h2 class="row-title">SERVER 2 (ASIA & ACTION)</h2>
-            <div class="row-posters">
-                <div class="poster" onclick="handleMovieClick('The Raid: Redemption', '94329')" style="background-image: url('https://image.tmdb.org/t/p/w500/zBKkAQ9yHjQp0rtyr9rB62r7cR.jpg');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span>
-                        <span class="poster-title">The Raid</span>
-                        <span class="poster-meta">96% COCOK</span>
-                    </div>
-                </div>
-
-                <div class="poster" onclick="handleMovieClick('Parasite', '496243')" style="background-image: url('https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span>
-                        <span class="poster-title">Parasite</span>
-                        <span class="poster-meta">94% COCOK</span>
-                    </div>
-                </div>
+            <h2 class="row-title">RATING TERTINGGI</h2>
+            <div class="row-posters" id="row-top-rated">
+                <div class="loading-text">Sedang menyinkronkan data...</div>
             </div>
         </section>
-
     </div>
 
     <footer>
@@ -207,39 +168,131 @@
     </footer>
 
     <script>
-        // Cek status login
         let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
         let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
 
-        if (!isLoggedIn) {
-            window.location.href = 'login.html';
+        if (!isLoggedIn) { window.location.href = 'login.html'; }
+
+        // --- KONFIGURASI API ---
+        const TMDB_API_KEY = "8a25c6f059e0a8adbb2799c4c7c88b0a";
+        // Menggunakan domain alternatif resmi tmdb.org yang kebal blokir ISP
+        const TMDB_BASE_URL = "https://api.tmdb.org/3";
+        const IMG_BASE_URL = "https://image.tmdb.org/t/p/w500";
+
+        // --- SISTEM PENYELAMAT OTOMATIS (FALLBACK) ---
+        // Jika internet memblokir API, data cadangan ini akan otomatis terisi dalam sekejap
+        const fallbackMoviesData = [
+            { id: 533535, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", vote_average: 8.5 },
+            { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", vote_average: 8.3 },
+            { id: 157336, title: "Interstellar", poster_path: "/gEU2QniE6E77NI6lCU6MvrIdZ2O.jpg", vote_average: 8.6 },
+            { id: 76600, title: "Avatar: The Way of Water", poster_path: "/t6HIqrNDIGGLtivpAezq1Io00A3.jpg", vote_average: 7.8 },
+            { id: 94329, title: "The Raid", poster_path: "/zBKkAQ9yHjQp0rtyr9rB62r7cR.jpg", vote_average: 7.6 },
+            { id: 496243, title: "Parasite", poster_path: "/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg", vote_average: 8.5 }
+        ];
+
+        // --- FUNGSI PENCARIAN FILM ---
+        async function searchMovies(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('searchInput').value;
+                if (!query) return;
+                
+                document.getElementById('title-popular').innerText = `HASIL PENCARIAN: ${query.toUpperCase()}`;
+                document.getElementById('row-popular').innerHTML = '<div class="loading-text">Mencari...</div>';
+
+                try {
+                    const response = await fetch(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&language=id-ID&query=${query}`);
+                    if (!response.ok) throw new Error("Terblokir");
+                    const data = await response.json();
+                    renderMovies(data.results, 'row-popular');
+                } catch (error) {
+                    // Jika diblokir, tetap tampilkan cadangan
+                    renderMovies(fallbackMoviesData, 'row-popular');
+                }
+            }
         }
 
-        // --- 1. LOGIKA ACCORDION MENU ---
-        function toggleAccordion(dropdownId, iconId) {
-            document.getElementById(dropdownId).classList.toggle('active');
-            document.getElementById(iconId).classList.toggle('rotate');
+        // --- FUNGSI MENGAMBIL DATA FILM ---
+        async function fetchPopularMovies() {
+            try {
+                const response = await fetch(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}&language=id-ID`);
+                if (!response.ok) throw new Error("Terblokir");
+                const data = await response.json();
+                renderMovies(data.results, 'row-popular');
+            } catch (error) {
+                // Nol Stuck! Otomatis lempar ke cadangan jika diblokir
+                renderMovies(fallbackMoviesData, 'row-popular');
+            }
         }
 
-        // --- 2. LOGIKA KLIK FILM KE VIDLINK ---
-        // Fungsi ini membaca ID TMDB yang disematkan di HTML, lalu membawanya ke room.html atau nobar.html
+        async function fetchTopRatedMovies() {
+            try {
+                const response = await fetch(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=id-ID&page=1`);
+                if (!response.ok) throw new Error("Terblokir");
+                const data = await response.json();
+                // Potong data dari array agar beda dengan yang popular
+                renderMovies(data.results.slice(5, 15), 'row-top-rated');
+            } catch (error) {
+                // Reverse array cadangan agar terlihat beda baris atas dan bawah
+                renderMovies([...fallbackMoviesData].reverse(), 'row-top-rated');
+            }
+        }
+
+        // --- FUNGSI MENCETAK POSTER KE LAYAR ---
+        function renderMovies(moviesArray, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; 
+
+            if (!moviesArray || moviesArray.length === 0) {
+                container.innerHTML = '<div class="loading-text">Film tidak ditemukan.</div>';
+                return;
+            }
+
+            moviesArray.forEach(movie => {
+                if(!movie.poster_path) return;
+
+                const matchPercent = Math.round(movie.vote_average * 10);
+                const safeTitle = movie.title.replace(/'/g, "");
+
+                const posterHTML = `
+                    <div class="poster" onclick="handleMovieClick('${safeTitle}', '${movie.id}')" style="background-image: url('${IMG_BASE_URL}${movie.poster_path}');">
+                        <div class="poster-overlay">
+                            <span class="play-icon">▶</span>
+                            <span class="poster-title">${movie.title}</span>
+                            <span class="poster-meta">${matchPercent}% COCOK</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += posterHTML;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchPopularMovies();
+            fetchTopRatedMovies();
+        });
+
+
+        // --- LOGIKA KLIK FILM MENUJU VIDLINK (SISTEM ID) ---
         function handleMovieClick(movieTitle, tmdbId) {
             const urlParams = new URLSearchParams(window.location.search);
             const mode = urlParams.get('mode');
 
             if (mode === 'nobar') {
-                // Simpan ke local storage untuk digunakan di nobar.html
                 localStorage.setItem('zeeoskop_selected_movie_title', movieTitle);
                 localStorage.setItem('zeeoskop_selected_movie_id', tmdbId);
                 window.location.href = 'nobar.html';
             } else {
-                // Kirim ID lewat URL untuk mode nonton sendiri (langsung ke room.html)
                 const generatedSoloId = 'ZSKP-SOLO-' + Math.floor(100 + Math.random() * 900);
                 window.location.href = `room.html?id=${generatedSoloId}&tmdb=${tmdbId}`;
             }
         }
 
-        // --- 3. LOGIKA SIDEBAR & UI ---
+        // --- LOGIKA SIDEBAR MENU ---
+        function toggleAccordion(dropdownId, iconId) {
+            document.getElementById(dropdownId).classList.toggle('active');
+            document.getElementById(iconId).classList.toggle('rotate');
+        }
+
         function toggleMenu() {
             document.getElementById('sidebar-menu').classList.toggle('active');
             document.getElementById('menu-overlay').classList.toggle('active');
@@ -249,17 +302,8 @@
         function updateSidebarUI() {
             const profileSection = document.getElementById('sidebar-profile-section');
             const authBtn = document.getElementById('sidebar-auth-btn');
-
             if (isLoggedIn) {
-                profileSection.innerHTML = `
-                    <div class="profile-card">
-                        <div class="profile-pic"></div>
-                        <div class="profile-info">
-                            <h4>${userName}</h4>
-                            <span>★ VIP Member</span>
-                        </div>
-                    </div>
-                `;
+                profileSection.innerHTML = `<div class="profile-card"><div class="profile-pic"></div><div class="profile-info"><h4>${userName}</h4><span>★ VIP Member</span></div></div>`;
                 authBtn.innerText = "Keluar";
                 authBtn.className = "auth-sidebar-btn logout-btn";
             }
