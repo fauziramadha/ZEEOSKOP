@@ -10,8 +10,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
         body { background-color: #141414; color: #fff; overflow-x: hidden; min-height: 100dvh; display: flex; flex-direction: column; }
 
-        /* --- HEADER IDENTIK --- */
-        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        /* --- HEADER --- */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); }
         .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
         .menu-btn:hover { color: #d4af37; }
@@ -30,7 +30,6 @@
         .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: flex-start; cursor: pointer; }
         .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
         
-        /* CSS Khusus Accordion Menu */
         .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
         .accordion-content.active { display: flex; }
         .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; text-decoration: none; transition: 0.2s; }
@@ -45,7 +44,7 @@
         .menu-overlay.active { display: block; opacity: 1; }
 
         /* --- WRAPPER CONTENT & SEARCH AREA --- */
-        .content-wrapper { padding-top: 120px; flex: 1; display: flex; flex-direction: column; }
+        .content-wrapper { padding-top: 100px; flex: 1; display: flex; flex-direction: column; }
 
         .search-container { padding: 0 4% 30px 4%; max-width: 600px; width: 100%; }
         .search-box { width: 100%; background: #222; border: 1px solid #444; border-radius: 4px; padding: 15px 20px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; }
@@ -55,7 +54,7 @@
         .row-section { padding: 0 4% 40px 4%; }
         .row-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; color: #fff; border-left: 4px solid #e50914; padding-left: 12px; text-transform: uppercase; letter-spacing: 1px; }
         
-        .row-posters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
+        .row-posters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; min-height: 250px; align-items: center; }
         .row-posters::-webkit-scrollbar { display: none; }
         
         .poster { min-width: 160px; height: 240px; background-color: #222; border-radius: 4px; cursor: pointer; transition: transform 0.3s ease; background-size: cover; background-position: center; position: relative; overflow: hidden; }
@@ -67,8 +66,10 @@
         .play-icon { font-size: 2.2rem; color: #d4af37; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
         .poster-title { font-size: 0.85rem; font-weight: 800; color: #fff; letter-spacing: 0.5px; line-height: 1.2; }
         .poster-meta { font-size: 0.7rem; color: #46d369; font-weight: bold; margin-top: 4px; }
+        
+        .loading-text { color: #888; font-size: 0.9rem; font-style: italic; width: 100%; text-align: left; }
 
-        /* --- FOOTER IDENTIK --- */
+        /* --- FOOTER --- */
         footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: auto; border-top: 1px solid #222; background-color: #141414; }
         .footer-call { margin-bottom: 30px; font-size: 1rem; }
         .footer-call a { color: #737373; text-decoration: none; }
@@ -95,7 +96,6 @@
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
     </header>
 
-    <!-- SIDEBAR MENU KHUSUS DENGAN ACCORDION -->
     <div class="sidebar-menu" id="sidebar-menu">
         <button class="close-btn" onclick="toggleMenu()">×</button>
         <div id="sidebar-profile-section"></div>
@@ -103,22 +103,17 @@
         <div class="menu-links">
             <a href="index.html">Beranda</a>
             
-            <!-- ACCORDION KATEGORI FILM (Ditandai Aktif) -->
             <div class="accordion-item" style="background: rgba(255,255,255,0.05); border-left: 3px solid #d4af37; border-radius: 8px;">
                 <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;" style="color: #fff;">
                     Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
                 </a>
-                
                 <div class="accordion-content active" id="kategori-dropdown">
-                    <a href="#" onclick="alert('Memuat Daftar Genre...'); return false;">Genre</a>
-                    <a href="#" onclick="alert('Memuat Daftar Negara...'); return false;">Negara</a>
-                    <a href="#" onclick="alert('Memuat Daftar Tahun...'); return false;">Tahun</a>
-                    
-                    <!-- SUB-ACCORDION: JELAJAHI -->
+                    <a href="#">Genre</a>
+                    <a href="#">Negara</a>
+                    <a href="#">Tahun</a>
                     <a href="#" onclick="toggleAccordion('jelajahi-dropdown', 'icon-jelajahi'); return false;" style="color: #fff; font-weight: bold; margin-top: 5px;">
                         Jelajahi <span class="arrow-icon" id="icon-jelajahi">▼</span>
                     </a>
-                    
                     <div class="accordion-content" id="jelajahi-dropdown" style="border-left: 1px solid #444; margin-left: 10px;">
                         <a href="#">Terpopuler</a>
                         <a href="#">Rating Tertinggi</a>
@@ -136,62 +131,27 @@
         <button class="auth-sidebar-btn" id="sidebar-auth-btn" onclick="handleAuthClick()">Masuk</button>
     </div>
 
-    <!-- WRAPPER CONTENT -->
     <div class="content-wrapper">
-        
-        <!-- BAR PENCARIAN -->
         <div class="search-container">
-            <input type="text" class="search-box" placeholder="Cari judul film, genre, atau server...">
+            <input type="text" class="search-box" id="searchInput" placeholder="Cari judul film..." onkeyup="searchMovies(event)">
         </div>
 
-        <!-- BARIS SERVER 1 (VIP) -->
         <section class="row-section">
-            <h2 class="row-title">SERVER 1 (VIP MOVIE)</h2>
-            <div class="row-posters">
-                <!-- Logika Klik Cerdas ditanam pada fungsi onclick dengan parameter TMDB ID -->
-                <div class="poster" onclick="handleMovieClick('Avenger: Secret Wars', '1005020')" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">Avenger: Secret Wars</span>
-                        <span class="poster-meta">98% COCOK</span>
-                    </div>
-                </div>
-                <div class="poster" onclick="handleMovieClick('Avatar: The Deep Ocean', '76600')" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">Avatar: The Deep Ocean</span>
-                        <span class="poster-meta">95% COCOK</span>
-                    </div>
-                </div>
-                <div class="poster" onclick="handleMovieClick('Interstellar', '157336')" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">Interstellar</span>
-                        <span class="poster-meta">99% COCOK</span>
-                    </div>
-                </div>
+            <h2 class="row-title">FILM POPULER SAAT INI</h2>
+            <div class="row-posters" id="row-popular">
+                <div class="loading-text">Sedang memuat tayangan dari server...</div>
             </div>
         </section>
 
-        <!-- BARIS SERVER 2 (ASIA) -->
         <section class="row-section">
-            <h2 class="row-title">SERVER 2 (ASIA & DRAMA)</h2>
-            <div class="row-posters">
-                <div class="poster" onclick="handleMovieClick('The Raid', '94329')" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">The Raid</span>
-                        <span class="poster-meta">92% COCOK</span>
-                    </div>
-                </div>
-                <div class="poster" onclick="handleMovieClick('Akira', '149')" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600');">
-                    <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">Akira</span>
-                        <span class="poster-meta">89% COCOK</span>
-                    </div>
-                </div>
+            <h2 class="row-title">RATING TERTINGGI</h2>
+            <div class="row-posters" id="row-top-rated">
+                <div class="loading-text">Sedang memuat tayangan dari server...</div>
             </div>
         </section>
 
     </div>
 
-    <!-- FOOTER IDENTIK -->
     <footer>
         <div class="footer-call">Ada pertanyaan? Hubungi <a href="#">0800-1-ZEEOSKOP</a></div>
         <div class="footer-columns">
@@ -199,63 +159,110 @@
                 <h4>Explore</h4>
                 <a href="index.html">Beranda</a>
                 <a href="film.html">Kategori Film</a>
-                <a href="#">Cara Menonton</a>
-                <a href="#">Resolusi & Format</a>
             </div>
             <div class="footer-col">
                 <h4>Support</h4>
                 <a href="#">Akun Saya</a>
-                <a href="#">Pusat Media</a>
-                <a href="#">Ketentuan Penggunaan</a>
-            </div>
-            <div class="footer-col">
-                <h4>Help Center</h4>
-                <a href="#">Tanya Jawab</a>
                 <a href="bantuan.html">Pusat Bantuan</a>
-                <a href="#">Privasi Pengguna</a>
-                <a href="#">Hubungi Kami</a>
             </div>
         </div>
         <div class="footer-brand">ZEEOSKOP</div>
     </footer>
 
-    <!-- LOGIKA JAVASCRIPT UTAMA -->
     <script>
         let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
         let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
 
-        // PROTEKSI
-        if (!isLoggedIn) {
-            window.location.href = 'login.html';
+        if (!isLoggedIn) { window.location.href = 'login.html'; }
+
+        // ==========================================
+        // KONFIGURASI API TMDB
+        // ==========================================
+        // Perhatian: Ini menggunakan API Key TMDB public dummy/sementara untuk demo.
+        // Nanti kamu harus mengganti "YOUR_TMDB_API_KEY" dengan kunci gratis dari themoviedb.org
+        const TMDB_API_KEY = "8a25c6f059e0a8adbb2799c4c7c88b0a"; // Ganti ini nanti
+        const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+        const IMG_BASE_URL = "https://image.tmdb.org/t/p/w500";
+
+        // Fungsi Menarik Film Populer
+        async function fetchPopularMovies() {
+            try {
+                const response = await fetch(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}&language=id-ID`);
+                const data = await response.json();
+                renderMovies(data.results, 'row-popular');
+            } catch (error) {
+                document.getElementById('row-popular').innerHTML = '<div class="loading-text" style="color:red;">Gagal memuat tayangan. Periksa koneksi internet.</div>';
+            }
         }
 
-        // --- 1. LOGIKA ACCORDION MENU ---
+        // Fungsi Menarik Film Rating Tertinggi
+        async function fetchTopRatedMovies() {
+            try {
+                const response = await fetch(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=id-ID&page=1`);
+                const data = await response.json();
+                renderMovies(data.results, 'row-top-rated');
+            } catch (error) {
+                document.getElementById('row-top-rated').innerHTML = '<div class="loading-text" style="color:red;">Gagal memuat tayangan.</div>';
+            }
+        }
+
+        // Fungsi Render HTML ke Layar
+        function renderMovies(moviesArray, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Kosongkan text loading
+
+            moviesArray.forEach(movie => {
+                // Hindari error jika film tidak punya gambar poster
+                if(!movie.poster_path) return;
+
+                // Hitung persen kecocokan asal-asalan dari rating
+                const matchPercent = Math.round(movie.vote_average * 10);
+                
+                // Judul rapi, hilangkan kutip agar tidak error saat di-klik
+                const safeTitle = movie.title.replace(/'/g, "");
+
+                const posterHTML = `
+                    <div class="poster" onclick="handleMovieClick('${safeTitle}', '${movie.id}')" style="background-image: url('${IMG_BASE_URL}${movie.poster_path}');">
+                        <div class="poster-overlay">
+                            <span class="play-icon">▶</span>
+                            <span class="poster-title">${movie.title}</span>
+                            <span class="poster-meta">${matchPercent}% COCOK</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += posterHTML;
+            });
+        }
+
+        // Jalankan Fetching saat halaman dimuat
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchPopularMovies();
+            fetchTopRatedMovies();
+        });
+
+
+        // ==========================================
+        // LOGIKA UI BAWAAN
+        // ==========================================
         function toggleAccordion(dropdownId, iconId) {
-            const dropdown = document.getElementById(dropdownId);
-            const icon = document.getElementById(iconId);
-            
-            dropdown.classList.toggle('active');
-            icon.classList.toggle('rotate');
+            document.getElementById(dropdownId).classList.toggle('active');
+            document.getElementById(iconId).classList.toggle('rotate');
         }
 
-        // --- 2. LOGIKA KLIK FILM DENGAN TRANSMISI ID TMDB ---
         function handleMovieClick(movieTitle, tmdbId) {
             const urlParams = new URLSearchParams(window.location.search);
             const mode = urlParams.get('mode');
 
             if (mode === 'nobar') {
-                // Mode Nobar: Simpan ke memori lalu kembali ke dashboard nobar
                 localStorage.setItem('zeeoskop_selected_movie_title', movieTitle);
                 localStorage.setItem('zeeoskop_selected_movie_id', tmdbId);
                 window.location.href = 'nobar.html';
             } else {
-                // Mode Nonton Sendiri: Lempar langsung ke room dengan ID ruangan & ID film
                 const generatedSoloId = 'ZSKP-SOLO-' + Math.floor(100 + Math.random() * 900);
                 window.location.href = `room.html?id=${generatedSoloId}&tmdb=${tmdbId}`;
             }
         }
 
-        // Kontrol Menu Samping & Auth
         function toggleMenu() {
             document.getElementById('sidebar-menu').classList.toggle('active');
             document.getElementById('menu-overlay').classList.toggle('active');
@@ -265,17 +272,8 @@
         function updateSidebarUI() {
             const profileSection = document.getElementById('sidebar-profile-section');
             const authBtn = document.getElementById('sidebar-auth-btn');
-
             if (isLoggedIn) {
-                profileSection.innerHTML = `
-                    <div class="profile-card">
-                        <div class="profile-pic"></div>
-                        <div class="profile-info">
-                            <h4>${userName}</h4>
-                            <span>★ VIP Member</span>
-                        </div>
-                    </div>
-                `;
+                profileSection.innerHTML = `<div class="profile-card"><div class="profile-pic"></div><div class="profile-info"><h4>${userName}</h4><span>★ VIP Member</span></div></div>`;
                 authBtn.innerText = "Keluar";
                 authBtn.className = "auth-sidebar-btn logout-btn";
             }
