@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEEOSKOP | Admin Control Panel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #0a0a0a; color: #fff; display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- SIDEBAR ADMIN --- */
+        .admin-sidebar { width: 280px; background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .admin-header { padding: 30px 20px; border-bottom: 1px solid #222; text-align: center; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: #d4af37; letter-spacing: 2px; }
+        .badge { background: #e50914; color: #fff; font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; vertical-align: top; margin-left: 5px; }
+        
+        .nav-tabs { flex: 1; padding: 20px 0; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
+        .nav-btn { background: transparent; border: none; color: #a3a3a3; padding: 15px 20px; text-align: left; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent; }
+        .nav-btn:hover { background: #1a1a1a; color: #fff; }
+        .nav-btn.active { background: #1a1a1a; color: #d4af37; border-left-color: #d4af37; }
+
+        .admin-footer { padding: 20px; border-top: 1px solid #222; text-align: center; }
+        .btn-logout { background: transparent; border: 1px solid #555; color: #ccc; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-logout:hover { background: #e50914; border-color: #e50914; color: #fff; }
+
+        /* --- MAIN CONTENT AREA --- */
+        .admin-main { flex: 1; display: flex; flex-direction: column; background: #0a0a0a; }
+        .topbar { background: #111; padding: 20px 40px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h2 { font-size: 1.5rem; color: #fff; }
+        .btn-save-all { background: #d4af37; color: #000; padding: 12px 25px; font-size: 1rem; font-weight: 800; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
+        .btn-save-all:hover { background: #fff; transform: translateY(-2px); }
+
+        .content-body { flex: 1; padding: 40px; overflow-y: auto; }
+        
+        /* --- FORM ELEMENTS --- */
+        .tab-content { display: none; animation: fadeIn 0.3s ease; max-width: 900px; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-section { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 30px; margin-bottom: 30px; }
+        .form-section h3 { font-size: 1.2rem; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.9rem; color: #a3a3a3; margin-bottom: 8px; font-weight: 600; }
+        .form-input { width: 100%; background: #000; border: 1px solid #333; border-radius: 4px; padding: 12px 15px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; }
+        .form-input:focus { border-color: #d4af37; background: #111; }
+        textarea.form-input { resize: vertical; min-height: 100px; }
+        
+        .input-row { display: flex; gap: 20px; }
+        .input-row .form-group { flex: 1; }
+
+        /* Notifikasi Toast */
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #46d369; color: #000; padding: 15px 25px; border-radius: 4px; font-weight: bold; transform: translateX(200%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .admin-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #333; }
+            .nav-tabs { flex-direction: row; overflow-x: auto; padding: 10px; gap: 10px; }
+            .nav-btn { white-space: nowrap; border-left: none; border-bottom: 4px solid transparent; padding: 10px 15px; }
+            .nav-btn.active { border-bottom-color: #d4af37; }
+            .input-row { flex-direction: column; gap: 0; }
+            .topbar { flex-direction: column; gap: 15px; text-align: center; }
+            .btn-save-all { width: 100%; }
+            .content-body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NOTIFIKASI SUKSES -->
+    <div class="toast" id="toast-msg">Data Berhasil Disimpan!</div>
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="admin-header">
+            <div class="logo">ZEEOSKOP<span class="badge">ADMIN</span></div>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('tab-global')">⚙️ Pengaturan Global</button>
+            <button class="nav-btn" onclick="switchTab('tab-index')">🏠 Halaman Beranda</button>
+            <button class="nav-btn" onclick="switchTab('tab-nobar')">🍿 Sesi Nobar & Room</button>
+            <button class="nav-btn" onclick="switchTab('tab-film')">🎬 Katalog Film</button>
+            <button class="nav-btn" onclick="switchTab('tab-vip')">💎 Paket VIP</button>
+            <button class="nav-btn" onclick="switchTab('tab-support')">💬 Bantuan & Update</button>
+        </div>
+        <div class="admin-footer">
+            <button class="btn-logout" onclick="window.location.href='index.html'">Kembali ke Web</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+        <div class="topbar">
+            <h2 id="topbar-title">Pengaturan Global (Header & Footer)</h2>
+            <button class="btn-save-all" onclick="saveAllSettings()">Simpan Perubahan</button>
+        </div>
+
+        <div class="content-body">
+            
+            <!-- TAB 1: GLOBAL (Footer & Navbar) -->
+            <div class="tab-content active" id="tab-global">
+                <div class="form-section">
+                    <h3>Identitas Merek</h3>
+                    <div class="form-group">
+                        <label>Nama Brand (Tampil di Navbar & Footer)</label>
+                        <input type="text" class="form-input" id="g_brand_name" value="ZEEOSKOP">
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Kontak & Footer</h3>
+                    <div class="form-group">
+                        <label>Teks Call Center</label>
+                        <input type="text" class="form-input" id="g_footer_call" value="Ada pertanyaan? Hubungi 0800-1-ZEEOSKOP">
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Tautan Pusat Bantuan (Footer)</label>
+                            <input type="text" class="form-input" id="g_link_bantuan" value="bantuan.html">
+                        </div>
+                        <div class="form-group">
+                            <label>Tautan Syarat & Ketentuan</label>
+                            <input type="text" class="form-input" id="g_link_terms" value="#">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: BERANDA (Index.html) -->
+            <div class="tab-content" id="tab-index">
+                <div class="form-section">
+                    <h3>Hero Section (Spanduk Utama)</h3>
+                    <div class="form-group">
+                        <label>Judul Utama (Gunakan tag &lt;br&gt; untuk enter)</label>
+                        <input type="text" class="form-input" id="idx_hero_title" value="NOBAR<br>PREMIUM">
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi Hero</label>
+                        <textarea class="form-input" id="idx_hero_desc">Bukan sekadar berbagi layar. Ciptakan ruang bioskop eksklusifmu, undang penonton, dan pegang kendali penuh atas tontonan.</textarea>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Pengaturan Tombol Beranda</h3>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Teks Tombol Kiri</label>
+                            <input type="text" class="form-input" id="idx_btn1_text" value="Mulai Nobar">
+                        </div>
+                        <div class="form-group">
+                            <label>URL / Link Tombol Kiri</label>
+                            <input type="text" class="form-input" id="idx_btn1_link" value="nobar.html">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Teks Tombol Kanan</label>
+                            <input type="text" class="form-input" id="idx_btn2_text" value="Nonton Sendiri">
+                        </div>
+                        <div class="form-group">
+                            <label>URL / Link Tombol Kanan</label>
+                            <input type="text" class="form-input" id="idx_btn2_link" value="film.html?mode=solo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: NOBAR & ROOM -->
+            <div class="tab-content" id="tab-nobar">
+                <div class="form-section">
+                    <h3>Kartu Buat Ruangan (nobar.html)</h3>
+                    <div class="form-group">
+                        <label>Judul Kartu 1</label>
+                        <input type="text" class="form-input" id="nbr_create_title" value="Buat Ruangan">
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi Kartu 1</label>
+                        <textarea class="form-input" id="nbr_create_desc">Ciptakan ruang sinema privat baru. Pilih film dari katalog premium kami, dapatkan kode undangan, dan mulai menonton bersama.</textarea>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Teks Tombol Cari Film</label>
+                            <input type="text" class="form-input" id="nbr_btn_source" value="Sumber Film">
+                        </div>
+                        <div class="form-group">
+                            <label>Teks Tombol Mulai Sesi</label>
+                            <input type="text" class="form-input" id="nbr_btn_start" value="Mulai Sesi Baru">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Tampilan Dalam Ruangan (room.html)</h3>
+                    <div class="form-group">
+                        <label>Pesan Tunggu Klien (Jika Host belum putar)</label>
+                        <input type="text" class="form-input" id="rm_wait_msg" value="Menunggu Host Memulai Tayangan...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: KATALOG FILM -->
+            <div class="tab-content" id="tab-film">
+                <div class="form-section">
+                    <h3>Pengaturan Pencarian</h3>
+                    <div class="form-group">
+                        <label>Teks Placeholder Kolom Pencarian</label>
+                        <input type="text" class="form-input" id="flm_search_placeholder" value="Cari judul film, genre, atau server...">
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Kategori Baris (Row Titles)</h3>
+                    <div class="form-group">
+                        <label>Judul Baris 1</label>
+                        <input type="text" class="form-input" id="flm_row1_title" value="SERVER 1 (VIP MOVIE)">
+                    </div>
+                    <div class="form-group">
+                        <label>Judul Baris 2</label>
+                        <input type="text" class="form-input" id="flm_row2_title" value="SERVER 2 (ASIA & DRAMA)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: VIP & PAKET -->
+            <div class="tab-content" id="tab-vip">
+                <div class="form-section">
+                    <h3>Header Halaman Membership</h3>
+                    <div class="form-group">
+                        <label>Judul Halaman VIP</label>
+                        <input type="text" class="form-input" id="vip_page_title" value="Pilih Paket Premium Anda">
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Harga Paket Membership</h3>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Harga Paket Tengah (VIP Premium)</label>
+                            <input type="text" class="form-input" id="vip_price_mid" value="Rp 49.000">
+                        </div>
+                        <div class="form-group">
+                            <label>Teks Tombol VIP Premium</label>
+                            <input type="text" class="form-input" id="vip_btn_mid" value="Pilih VIP Premium">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="form-group">
+                            <label>Harga Paket Kanan (Sultan)</label>
+                            <input type="text" class="form-input" id="vip_price_high" value="Rp 89.000">
+                        </div>
+                        <div class="form-group">
+                            <label>Teks Tombol Sultan</label>
+                            <input type="text" class="form-input" id="vip_btn_high" value="Pilih Paket Sultan">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: SUPPORT & UPDATE -->
+            <div class="tab-content" id="tab-support">
+                <div class="form-section">
+                    <h3>Pusat Bantuan (bantuan.html)</h3>
+                    <div class="form-group">
+                        <label>Judul Hero Bantuan</label>
+                        <input type="text" class="form-input" id="hlp_hero_title" value="Halo, ada yang bisa kami bantu?">
+                    </div>
+                    <div class="form-group">
+                        <label>Teks Tombol Live Chat</label>
+                        <input type="text" class="form-input" id="hlp_btn_chat" value="Hubungi Live Chat">
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h3>Halaman Notifikasi (update.html)</h3>
+                    <div class="form-group">
+                        <label>Teks Tombol Tandai Dibaca</label>
+                        <input type="text" class="form-input" id="upd_btn_read" value="Tandai Semua Dibaca">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- LOGIKA JAVASCRIPT CMS -->
+    <script>
+        // --- 1. LOGIKA PERPINDAHAN TAB ---
+        function switchTab(tabId) {
+            // Sembunyikan semua konten tab
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Hapus status aktif dari semua tombol navigasi
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Tampilkan tab yang dipilih
+            document.getElementById(tabId).classList.add('active');
+            
+            // Tandai tombol yang diklik (menggunakan event.currentTarget)
+            event.currentTarget.classList.add('active');
+
+            // Ubah Judul Topbar sesuai tab
+            const titles = {
+                'tab-global': 'Pengaturan Global (Header & Footer)',
+                'tab-index': 'Pengaturan Beranda Utama',
+                'tab-nobar': 'Manajemen Teks Sesi Nobar',
+                'tab-film': 'Pengaturan Katalog & Kategori',
+                'tab-vip': 'Harga & Teks Paket Membership',
+                'tab-support': 'Pengaturan Bantuan & Notifikasi'
+            };
+            document.getElementById('topbar-title').innerText = titles[tabId];
+        }
+
+        // --- 2. SISTEM PENYIMPANAN DATA (Persiapan Firebase) ---
+        // Struktur JSON ini sangat mirip dengan struktur Realtime Database Firebase
+        function saveAllSettings() {
+            // Mengumpulkan semua nilai dari input form
+            const adminData = {
+                global: {
+                    brandName: document.getElementById('g_brand_name').value,
+                    footerCall: document.getElementById('g_footer_call').value,
+                    linkBantuan: document.getElementById('g_link_bantuan').value,
+                    linkTerms: document.getElementById('g_link_terms').value
+                },
+                index: {
+                    heroTitle: document.getElementById('idx_hero_title').value,
+                    heroDesc: document.getElementById('idx_hero_desc').value,
+                    btn1Text: document.getElementById('idx_btn1_text').value,
+                    btn1Link: document.getElementById('idx_btn1_link').value,
+                    btn2Text: document.getElementById('idx_btn2_text').value,
+                    btn2Link: document.getElementById('idx_btn2_link').value
+                },
+                nobar: {
+                    createTitle: document.getElementById('nbr_create_title').value,
+                    createDesc: document.getElementById('nbr_create_desc').value,
+                    btnSource: document.getElementById('nbr_btn_source').value,
+                    btnStart: document.getElementById('nbr_btn_start').value,
+                    waitMsg: document.getElementById('rm_wait_msg').value
+                },
+                film: {
+                    searchPlaceholder: document.getElementById('flm_search_placeholder').value,
+                    row1Title: document.getElementById('flm_row1_title').value,
+                    row2Title: document.getElementById('flm_row2_title').value
+                },
+                vip: {
+                    pageTitle: document.getElementById('vip_page_title').value,
+                    priceMid: document.getElementById('vip_price_mid').value,
+                    btnMid: document.getElementById('vip_btn_mid').value,
+                    priceHigh: document.getElementById('vip_price_high').value,
+                    btnHigh: document.getElementById('vip_btn_high').value
+                },
+                support: {
+                    heroTitle: document.getElementById('hlp_hero_title').value,
+                    btnChat: document.getElementById('hlp_btn_chat').value,
+                    btnRead: document.getElementById('upd_btn_read').value
+                }
+            };
+
+            // SIMPAN KE LOCAL STORAGE (SEBAGAI PENGGANTI SEMENTARA FIREBASE)
+            // Nanti, kode ini cukup diganti dengan: set(ref(db, 'settings'), adminData);
+            localStorage.setItem('zeeoskop_admin_settings', JSON.stringify(adminData));
+
+            // Tampilkan Notifikasi Toast Emas
+            const toast = document.getElementById('toast-msg');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- 3. LOGIKA MEMUAT DATA SAAT HALAMAN DIBUKA ---
+        function loadSettings() {
+            const savedData = localStorage.getItem('zeeoskop_admin_settings');
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // Isi kembali form dari data yang tersimpan
+                // (Ini hanya contoh struktur pengembalian data, jika data ada, kita replace value di input)
+                if(data.global) {
+                    document.getElementById('g_brand_name').value = data.global.brandName || "ZEEOSKOP";
+                }
+                if(data.index) {
+                    document.getElementById('idx_hero_title').value = data.index.heroTitle || "NOBAR<br>PREMIUM";
+                    document.getElementById('idx_hero_desc').value = data.index.heroDesc || "";
+                    // ... dan seterusnya bisa dilanjutkan jika diperlukan pemuatan otomatis spesifik.
+                }
+            }
+        }
+
+        // Panggil fungsi muat data saat admin panel dibuka
+        window.onload = loadSettings;
+    </script>
+</body>
+</html>
