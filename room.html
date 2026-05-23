@@ -14,7 +14,7 @@
         html { height: -webkit-fill-available; }
 
         body { 
-            background-color: #141414; /* Hitam khas Netflix */
+            background-color: #141414; 
             color: #fff; 
             display: flex; 
             flex-direction: column; 
@@ -60,31 +60,23 @@
             z-index: 20; color: #fff; border: 1px solid #333; backdrop-filter: blur(5px);
         }
 
-        /* --- PEMUTAR VIDEO & KONTROL NETFLIX STYLE --- */
+        /* --- PEMUTAR VIDEO (VIDLINK) --- */
         .player-container { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; background-color: #000; }
         
+        /* Kontrol bawaan kita sisakan hanya untuk Fullscreen */
         .controls-bar { 
             position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 4%; 
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); 
-            display: flex; align-items: center; gap: 20px; opacity: 0; transition: opacity 0.4s ease; z-index: 20; 
+            display: flex; align-items: center; justify-content: flex-end; opacity: 0; transition: opacity 0.4s ease; z-index: 20; pointer-events: none;
         }
         .player-container:hover .controls-bar { opacity: 1; }
         
-        .control-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .control-btn { background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; transition: 0.2s; pointer-events: auto; }
         .control-btn:hover { color: #d4af37; transform: scale(1.1); }
-        
-        /* Garis Durasi Video */
-        .progress-container { flex: 1; height: 6px; background: rgba(255, 255, 255, 0.2); border-radius: 3px; cursor: pointer; position: relative; transition: height 0.2s; }
-        .progress-container:hover { height: 8px; }
-        .progress-filled { width: 0%; height: 100%; background: #d4af37; border-radius: 3px; position: relative; }
-        /* Titik merah/emas di ujung garis durasi */
-        .progress-filled::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); display: none; }
-        .progress-container:hover .progress-filled::after { display: block; }
 
-        /* --- SIDEBAR CHAT (BAWAH SAAT NORMAL, KANAN SAAT FULLSCREEN) --- */
+        /* --- SIDEBAR CHAT --- */
         .sidebar { width: 100%; flex: 1; background-color: #141414; display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 30; }
 
-        /* Mode Fullscreen / Pseudo Fullscreen */
+        /* Mode Fullscreen */
         .main-container.is-fullscreen { flex-direction: row; }
         .main-container.is-fullscreen .video-area { height: 100%; max-height: none; aspect-ratio: auto; }
         .main-container.is-fullscreen .sidebar { 
@@ -97,7 +89,7 @@
         /* Pseudo-fullscreen iOS */
         .main-container.is-pseudo-fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; z-index: 9999; }
 
-        /* Elemen Chat Premium */
+        /* Elemen Chat */
         .user-list-section { padding: 15px 20px; border-bottom: 1px solid #222; background: #0a0a0a; }
         .section-title { font-size: 0.75rem; color: #777; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
         .user-count { font-size: 0.9rem; display: flex; align-items: center; gap: 8px; font-weight: 600; }
@@ -114,10 +106,6 @@
         .chat-input:focus { border-color: #d4af37; background: #1a1a1a; }
         .send-btn { background-color: #fff; color: #000; border: none; padding: 0 20px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .send-btn:hover { background: #dcdcdc; }
-
-        /* Tombol Host Testing */
-        .test-host-btn { background: #e50914; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(229, 9, 20, 0.4); }
-        .test-host-btn:hover { background: #f40612; }
     </style>
 </head>
 <body>
@@ -133,22 +121,23 @@
     <div class="main-container" id="cinema-container">
         <!-- AREA VIDEO -->
         <div class="video-area">
-            <div class="role-indicator">Mode: Penonton (Terkunci)</div>
-            
-            <div style="position: absolute; top: 20px; right: 20px; z-index: 20;">
-                <button id="test-host-btn" class="test-host-btn">Klaim Host</button>
-            </div>
+            <div class="role-indicator">Sesi Premium Aktif</div>
 
             <div class="player-container">
-                <video id="main-video" src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" playsinline style="width: 100%; height: 100%; background: #000;"></video>
+                <!-- IFRAME VIDLINK -->
+                <!-- Angka 1005020 di bawah ini nantinya akan diganti secara dinamis oleh JavaScript menggunakan ID TMDB -->
+                <iframe 
+                    id="zeeoskop-player"
+                    src="https://vidlink.pro/movie/1005020" 
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    scrolling="no" 
+                    allowfullscreen>
+                </iframe>
                 
                 <div class="controls-bar">
-                    <button class="control-btn" id="play-pause-btn" title="Play/Pause">▶</button>
-                    <!-- GARIS DURASI -->
-                    <div class="progress-container" id="progress-bar-container">
-                        <div class="progress-filled" id="progress-bar"></div>
-                    </div>
-                    <button class="control-btn" onclick="toggleFullScreen()" title="Layar Penuh">⛶</button>
+                    <button class="control-btn" onclick="toggleFullScreen()" title="Layar Penuh ZEEOSKOP">⛶</button>
                 </div>
             </div>
         </div>
@@ -238,99 +227,25 @@
         }
     </script>
     
-    <!-- MENGAMBIL FIREBASE SDK MODERN & LOGIKA SINKRONISASI -->
+    <!-- FIREBASE LIVE CHAT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        let isHost = false; 
-        // Mengambil nama user dari sistem Login sebelumnya (jika ada)
         let userName = localStorage.getItem('zeeoskop_user') || 'Penonton';
 
         async function initFirebase() {
             try {
+                // Di masa depan, ini memanggil API Vercel milikmu untuk menyembunyikan API Key
                 const response = await fetch('/api/config');
                 const firebaseConfig = await response.json();
                 const app = initializeApp(firebaseConfig);
                 const db = getDatabase(app);
                 
                 setupLiveChat(db);
-                setupVideoSync(db);
             } catch (error) {
                 console.error("Gagal memuat API Vercel:", error);
             }
-        }
-
-        // --- LOGIKA VIDEO SINKRONISASI & SCRUBBING ---
-        function setupVideoSync(db) {
-            const roomID = document.getElementById('room-id-display').innerText;
-            const playerRef = ref(db, `rooms/${roomID}/player`);
-            
-            const video = document.getElementById('main-video');
-            const playPauseBtn = document.getElementById('play-pause-btn');
-            const roleIndicator = document.querySelector('.role-indicator');
-            const testHostBtn = document.getElementById('test-host-btn');
-            const progressBar = document.getElementById('progress-bar');
-            const progressContainer = document.getElementById('progress-bar-container');
-            
-            // 1. Klaim Host
-            testHostBtn.addEventListener('click', () => {
-                isHost = true;
-                userName = "[Host] " + userName;
-                roleIndicator.innerText = "Mode: HOST (Kendalikan Video)";
-                roleIndicator.style.background = "rgba(212, 175, 55, 0.9)"; // Warna Emas
-                roleIndicator.style.color = "#000";
-                testHostBtn.style.display = "none";
-            });
-
-            // 2. Tombol Play/Pause
-            playPauseBtn.addEventListener('click', () => {
-                if (!isHost) { alert("Hanya Host yang bisa memutar/menjeda video!"); return; }
-                
-                if (video.paused) {
-                    set(playerRef, { state: 'playing', time: video.currentTime });
-                } else {
-                    set(playerRef, { state: 'paused', time: video.currentTime });
-                }
-            });
-
-            // 3. FITUR SCRUBBING (GESER DURASI)
-            progressContainer.addEventListener('click', (e) => {
-                if (!isHost) { alert("Hanya Host yang bisa menggeser durasi film!"); return; }
-
-                const rect = progressContainer.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const newTime = (clickX / rect.width) * video.duration;
-                
-                // Ubah durasi langsung di layar Host & Kirim ke Firebase
-                video.currentTime = newTime;
-                set(playerRef, { state: video.paused ? 'paused' : 'playing', time: newTime });
-            });
-
-            // 4. Update UI Garis Durasi saat video berjalan
-            video.addEventListener('timeupdate', () => {
-                const percent = (video.currentTime / video.duration) * 100;
-                progressBar.style.width = `${percent}%`;
-            });
-
-            // 5. Menerima instruksi dari Firebase (Untuk Semua Perangkat)
-            onValue(playerRef, (snapshot) => {
-                const data = snapshot.val();
-                if (!data) return;
-
-                // Sensor Koreksi Waktu (Lompat otomatis jika selisih lebih dari 2 detik)
-                if (Math.abs(video.currentTime - data.time) > 2) {
-                    video.currentTime = data.time;
-                }
-
-                if (data.state === 'playing') {
-                    video.play();
-                    playPauseBtn.innerText = '⏸';
-                } else {
-                    video.pause();
-                    playPauseBtn.innerText = '▶';
-                }
-            });
         }
 
         // --- LOGIKA LIVE CHAT ---
@@ -358,7 +273,6 @@
                 const msgDiv = document.createElement('div');
                 msgDiv.className = 'message';
                 
-                // Format spesial jika yang mengirim adalah Host
                 if(data.name.includes("[Host]")) {
                     msgDiv.innerHTML = `<span class="username host-name">${data.name}:</span> ${data.text}`;
                 } else {
@@ -370,8 +284,8 @@
             });
         }
 
-        // Jalankan aplikasi
-        initFirebase();
+        // Jalankan aplikasi Firebase Chat
+        // initFirebase(); // Ini dikomen sementara sampai Backend Vercel milikmu siap
     </script>
 </body>
 </html>
