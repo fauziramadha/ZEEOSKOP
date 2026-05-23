@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEEOSKOP | Notifikasi Terbaru</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #141414; color: #fff; overflow-x: hidden; min-height: 100dvh; display: flex; flex-direction: column; }
+
+        /* --- HEADER IDENTIK --- */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-decoration: none; }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
+        .menu-btn:hover { color: #d4af37; }
+
+        /* --- SIDEBAR MENU & ACCORDION IDENTIK --- */
+        .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-menu.active { right: 0; }
+        .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
+        
+        .profile-card { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; }
+        .profile-pic { width: 50px; height: 50px; background: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png') center/cover; border-radius: 4px; border: 1px solid #d4af37; }
+        .profile-info h4 { font-size: 1.1rem; color: #fff; }
+        .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
+
+        .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
+        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        
+        .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
+        .accordion-content.active { display: flex; }
+        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; text-decoration: none; display: block; transition: 0.2s; }
+        .accordion-content a:hover { color: #fff; border-left: 2px solid #e50914; padding-left: 15px; background: transparent; }
+        .arrow-icon { margin-left: auto; font-size: 0.8rem; transition: transform 0.3s; }
+        .arrow-icon.rotate { transform: rotate(180deg); color: #d4af37; }
+
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; margin-top: 20px;}
+        .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
+
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        /* --- WRAPPER CONTENT & KOTAK NOTIFIKASI --- */
+        .content-wrapper { padding-top: 120px; flex: 1; display: flex; flex-direction: column; align-items: center; padding-bottom: 60px; }
+        
+        .page-header { width: 100%; max-width: 800px; padding: 0 4%; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .page-header h1 { font-size: 2rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #d4af37; padding-left: 15px; }
+        
+        .btn-mark-read { background: transparent; border: 1px solid #555; color: #aaa; padding: 8px 15px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-mark-read:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff; }
+
+        .notif-container { width: 100%; max-width: 800px; padding: 0 4%; display: flex; flex-direction: column; gap: 15px; }
+
+        /* --- ITEM NOTIFIKASI --- */
+        .notif-item { 
+            background: #0a0a0a; border: 1px solid #222; border-radius: 8px; padding: 20px; 
+            display: flex; gap: 20px; align-items: center; cursor: pointer; transition: 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .notif-item:hover { border-color: #555; background: #111; transform: translateX(5px); }
+        
+        /* Highlight khusus untuk notifikasi belum dibaca */
+        .notif-item.unread { background: linear-gradient(to right, rgba(212, 175, 55, 0.05), #0a0a0a); border-left: 3px solid #d4af37; }
+        .unread-dot { width: 10px; height: 10px; background: #d4af37; border-radius: 50%; box-shadow: 0 0 10px rgba(212, 175, 55, 0.8); flex-shrink: 0; opacity: 0; transition: 0.3s; }
+        .notif-item.unread .unread-dot { opacity: 1; }
+
+        .notif-icon { width: 60px; height: 60px; border-radius: 50%; background-color: #222; display: flex; justify-content: center; align-items: center; flex-shrink: 0; font-size: 1.8rem; border: 1px solid #333; }
+        
+        /* Ikon spesifik berdasarkan tipe notifikasi */
+        .icon-movie { background: linear-gradient(135deg, #e50914, #8b0000); color: #fff; border: none; }
+        .icon-invite { background: linear-gradient(135deg, #46d369, #0f6c26); color: #fff; border: none; }
+        .icon-system { background: linear-gradient(135deg, #d4af37, #8b7324); color: #000; border: none; }
+
+        .notif-content { flex: 1; }
+        .notif-title { font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
+        .notif-desc { font-size: 0.9rem; color: #a3a3a3; line-height: 1.5; margin-bottom: 8px; }
+        .notif-time { font-size: 0.75rem; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- FOOTER IDENTIK --- */
+        footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: auto; border-top: 1px solid #222; background-color: #141414; }
+        .footer-call { margin-bottom: 30px; font-size: 1rem; }
+        .footer-call a { color: #737373; text-decoration: none; }
+        .footer-call a:hover { text-decoration: underline; }
+        .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .footer-col h4 { color: #fff; margin-bottom: 15px; font-size: 1rem; font-weight: 600; }
+        .footer-col a { display: block; color: #737373; text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; }
+        .footer-col a:hover { text-decoration: underline; color: #fff; }
+        .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .notif-item { padding: 15px; gap: 15px; }
+            .notif-icon { width: 50px; height: 50px; font-size: 1.5rem; }
+            .footer-columns { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <header>
+        <a href="index.html" class="logo">ZEEOSKOP</a>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </header>
+
+    <!-- SIDEBAR MENU IDENTIK -->
+    <div class="sidebar-menu" id="sidebar-menu">
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+        <div id="sidebar-profile-section"></div>
+        
+        <div class="menu-links">
+            <a href="index.html">Beranda</a>
+            
+            <div class="accordion-item">
+                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;">
+                    Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
+                </a>
+                <div class="accordion-content" id="kategori-dropdown">
+                    <a href="#">Genre</a>
+                    <a href="#">Negara</a>
+                    <a href="#">Tahun</a>
+                    
+                    <a href="#" onclick="toggleAccordion('jelajahi-dropdown', 'icon-jelajahi'); return false;" style="color: #fff; font-weight: bold; margin-top: 5px;">
+                        Jelajahi <span class="arrow-icon" id="icon-jelajahi">▼</span>
+                    </a>
+                    <div class="accordion-content" id="jelajahi-dropdown" style="border-left: 1px solid #444; margin-left: 10px;">
+                        <a href="#">Terpopuler</a>
+                        <a href="#">Rating Tertinggi</a>
+                        <a href="#">Rekomendasi</a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="favorit.html">Film Favorit Saya</a>
+            
+            <!-- Penanda Menu Aktif -->
+            <a href="update.html" style="color: #fff; border-left: 3px solid #d4af37; background: rgba(255,255,255,0.1); padding-left: 20px;">Notifikasi Baru</a>
+            
+            <a href="vip.html">Paket Membership</a>
+            <a href="bantuan.html">Pusat Bantuan</a>
+        </div>
+        
+        <button class="auth-sidebar-btn" id="sidebar-auth-btn" onclick="handleAuthClick()">Masuk</button>
+    </div>
+
+    <!-- WRAPPER CONTENT -->
+    <div class="content-wrapper">
+        
+        <div class="page-header">
+            <h1>Notifikasi</h1>
+            <button class="btn-mark-read" onclick="markAllAsRead()">Tandai Semua Dibaca</button>
+        </div>
+
+        <div class="notif-container" id="notification-list">
+            
+            <!-- Notifikasi 1: Undangan (Unread) -->
+            <div class="notif-item unread" onclick="readNotification(this)">
+                <div class="unread-dot"></div>
+                <div class="notif-icon icon-invite">🎫</div>
+                <div class="notif-content">
+                    <div class="notif-title">Undangan Room Nobar Baru!</div>
+                    <div class="notif-desc">Admin ZEEOSKOP mengundang Anda untuk bergabung ke dalam sesi nobar privat: <strong>ZSKP-998</strong>. Klik untuk langsung masuk ke ruangan.</div>
+                    <div class="notif-time">2 Jam yang lalu</div>
+                </div>
+            </div>
+
+            <!-- Notifikasi 2: Update Film (Unread) -->
+            <div class="notif-item unread" onclick="readNotification(this)">
+                <div class="unread-dot"></div>
+                <div class="notif-icon icon-movie">🎬</div>
+                <div class="notif-content">
+                    <div class="notif-title">Film Baru Ditambahkan</div>
+                    <div class="notif-desc">Katalog Server VIP telah diperbarui! Saksikan tayangan perdana eksklusif "Avenger: Secret Wars" dengan resolusi 4K HDR. Siapkan cemilan Anda sekarang.</div>
+                    <div class="notif-time">Kemarin</div>
+                </div>
+            </div>
+
+            <!-- Notifikasi 3: Promo / System (Sudah Dibaca) -->
+            <div class="notif-item" onclick="readNotification(this)">
+                <div class="unread-dot"></div>
+                <div class="notif-icon icon-system">👑</div>
+                <div class="notif-content">
+                    <div class="notif-title">Diskon 50% Paket VIP Premium</div>
+                    <div class="notif-desc">Penawaran terbatas akhir pekan! Tingkatkan akun Anda menjadi VIP Premium hanya dengan setengah harga. Nikmati bebas iklan dan kapasitas room lebih besar.</div>
+                    <div class="notif-time">3 Hari yang lalu</div>
+                </div>
+            </div>
+
+            <!-- Notifikasi 4: System (Sudah Dibaca) -->
+            <div class="notif-item" onclick="readNotification(this)">
+                <div class="unread-dot"></div>
+                <div class="notif-icon" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png'); background-size: cover;"></div>
+                <div class="notif-content">
+                    <div class="notif-title">Selamat Datang di ZEEOSKOP</div>
+                    <div class="notif-desc">Terima kasih telah bergabung. Akun Anda berhasil dibuat. Jelajahi ratusan koleksi film dan mulai pengalaman bioskop sinkronisasi pertama Anda!</div>
+                    <div class="notif-time">1 Minggu yang lalu</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER IDENTIK -->
+    <footer>
+        <div class="footer-call">Ada pertanyaan? Hubungi <a href="#">0800-1-ZEEOSKOP</a></div>
+        <div class="footer-columns">
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="index.html">Beranda</a>
+                <a href="film.html">Kategori Film</a>
+                <a href="#">Cara Menonton</a>
+                <a href="#">Resolusi & Format</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Akun Saya</a>
+                <a href="#">Pusat Media</a>
+                <a href="#">Ketentuan Penggunaan</a>
+            </div>
+            <div class="footer-col">
+                <h4>Help Center</h4>
+                <a href="#">Tanya Jawab</a>
+                <a href="bantuan.html">Pusat Bantuan</a>
+                <a href="#">Privasi Pengguna</a>
+                <a href="#">Hubungi Kami</a>
+            </div>
+        </div>
+        <div class="footer-brand">ZEEOSKOP</div>
+    </footer>
+
+    <!-- LOGIKA JAVASCRIPT UTAMA -->
+    <script>
+        let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
+        let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
+
+        // PROTEKSI: Wajib login untuk melihat notifikasi
+        if (!isLoggedIn) {
+            alert("Silakan masuk terlebih dahulu untuk melihat Notifikasi Anda.");
+            window.location.href = 'login.html';
+        }
+
+        // --- FUNGSI INTERAKTIF NOTIFIKASI ---
+        function readNotification(element) {
+            // Menghapus class 'unread' sehingga efek border emas dan titik emas menghilang
+            if (element.classList.contains('unread')) {
+                element.classList.remove('unread');
+            } else {
+                // Simulasi aksi saat di klik (misal: pergi ke nobar atau promo)
+                alert("Membuka detail notifikasi...");
+            }
+        }
+
+        function markAllAsRead() {
+            const unreadItems = document.querySelectorAll('.notif-item.unread');
+            if(unreadItems.length === 0) {
+                alert("Semua notifikasi sudah dibaca.");
+                return;
+            }
+            
+            // Loop dan hapus class unread pada semua elemen
+            unreadItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+        }
+
+        // --- LOGIKA ACCORDION MENU ---
+        function toggleAccordion(dropdownId, iconId) {
+            const dropdown = document.getElementById(dropdownId);
+            const icon = document.getElementById(iconId);
+            dropdown.classList.toggle('active');
+            icon.classList.toggle('rotate');
+        }
+
+        // --- KONTROL SIDEBAR & AUTH ---
+        function toggleMenu() {
+            document.getElementById('sidebar-menu').classList.toggle('active');
+            document.getElementById('menu-overlay').classList.toggle('active');
+            updateSidebarUI();
+        }
+
+        function updateSidebarUI() {
+            const profileSection = document.getElementById('sidebar-profile-section');
+            const authBtn = document.getElementById('sidebar-auth-btn');
+
+            if (isLoggedIn) {
+                profileSection.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-pic"></div>
+                        <div class="profile-info">
+                            <h4>${userName}</h4>
+                            <span>★ VIP Member</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Keluar";
+                authBtn.className = "auth-sidebar-btn logout-btn";
+            }
+        }
+
+        function handleAuthClick() {
+            if (isLoggedIn) {
+                localStorage.removeItem('zeeoskop_loggedIn');
+                localStorage.removeItem('zeeoskop_user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        updateSidebarUI();
+    </script>
+</body>
+</html>
