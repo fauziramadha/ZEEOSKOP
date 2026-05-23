@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEEOSKOP | Film Favorit Saya</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #141414; color: #fff; overflow-x: hidden; min-height: 100dvh; display: flex; flex-direction: column; }
+
+        /* --- HEADER IDENTIK --- */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
+        .logo { font-size: 2rem; font-weight: 900; color: #d4af37; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-decoration: none; }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; transition: color 0.3s; }
+        .menu-btn:hover { color: #d4af37; }
+
+        /* --- SIDEBAR MENU & ACCORDION IDENTIK --- */
+        .sidebar-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-left: 1px solid rgba(212, 175, 55, 0.2); z-index: 1000; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-menu.active { right: 0; }
+        .close-btn { align-self: flex-end; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; margin-bottom: 20px; }
+        
+        .profile-card { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; cursor: pointer; }
+        .profile-pic { width: 50px; height: 50px; background: url('https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png') center/cover; border-radius: 4px; border: 1px solid #d4af37; }
+        .profile-info h4 { font-size: 1.1rem; color: #fff; }
+        .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
+
+        .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
+        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        
+        .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
+        .accordion-content.active { display: flex; }
+        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; text-decoration: none; display: block; transition: 0.2s; }
+        .accordion-content a:hover { color: #fff; border-left: 2px solid #e50914; padding-left: 15px; background: transparent; }
+        .arrow-icon { margin-left: auto; font-size: 0.8rem; transition: transform 0.3s; }
+        .arrow-icon.rotate { transform: rotate(180deg); color: #d4af37; }
+
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; margin-top: 20px;}
+        .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
+
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
+        .menu-overlay.active { display: block; opacity: 1; }
+
+        /* --- WRAPPER CONTENT & LAYOUT --- */
+        .content-wrapper { padding-top: 120px; padding-left: 4%; padding-right: 4%; flex: 1; display: flex; flex-direction: column; padding-bottom: 60px; }
+        
+        .page-header { width: 100%; margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .page-header h1 { font-size: 2rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #d4af37; padding-left: 15px; }
+
+        /* --- FAVORITES GRID --- */
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
+
+        .poster { 
+            width: 100%; aspect-ratio: 2/3; background-color: #222; border-radius: 6px; 
+            cursor: pointer; transition: transform 0.3s ease, border-color 0.3s; 
+            background-size: cover; background-position: center; position: relative; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid transparent;
+        }
+        .poster:hover { transform: scale(1.05); z-index: 10; border-color: #d4af37; }
+        
+        .poster-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease; padding: 0 15px 25px 15px; text-align: center;
+        }
+        .poster:hover .poster-overlay { opacity: 1; }
+        
+        .poster-title { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: 0.5px; line-height: 1.2; margin-bottom: 5px; text-shadow: 0 2px 5px #000; }
+        
+        /* Action Buttons on Hover */
+        .poster-actions { display: flex; gap: 15px; margin-top: 15px; }
+        .btn-circle { 
+            width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; 
+        }
+        .btn-play-mini { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .btn-play-mini:hover { background: #d4af37; transform: scale(1.1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        .btn-remove-mini { background: rgba(0,0,0,0.5); color: #fff; border: 2px solid #888; }
+        .btn-remove-mini:hover { border-color: #e50914; color: #e50914; background: rgba(229, 9, 20, 0.1); transform: scale(1.1); }
+
+        /* --- EMPTY STATE (DAFTAR KOSONG) --- */
+        .empty-state { text-align: center; padding: 80px 20px; width: 100%; display: none; } /* Tersembunyi otomatis via JS jika ada film */
+        .empty-icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; filter: grayscale(100%); }
+        .empty-state h2 { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: #fff; }
+        .empty-state p { font-size: 1rem; color: #a3a3a3; margin-bottom: 30px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+        .btn-explore { background: #e50914; color: #fff; padding: 15px 40px; font-size: 1.1rem; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-explore:hover { background: #f40612; box-shadow: 0 5px 20px rgba(229,9,20,0.4); }
+
+        /* --- FOOTER IDENTIK --- */
+        footer { padding: 50px 4%; color: #737373; font-size: 0.9rem; margin-top: auto; border-top: 1px solid #222; background-color: #141414; }
+        .footer-call { margin-bottom: 30px; font-size: 1rem; }
+        .footer-call a { color: #737373; text-decoration: none; }
+        .footer-call a:hover { text-decoration: underline; }
+        .footer-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .footer-col h4 { color: #fff; margin-bottom: 15px; font-size: 1rem; font-weight: 600; }
+        .footer-col a { display: block; color: #737373; text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; }
+        .footer-col a:hover { text-decoration: underline; color: #fff; }
+        .footer-brand { font-size: 1.5rem; font-weight: 900; color: #d4af37; opacity: 0.5; }
+
+        @media (max-width: 768px) {
+            .favorites-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } /* Paksa 2 kolom di HP */
+            .poster-actions { gap: 10px; margin-top: 10px; }
+            .btn-circle { width: 35px; height: 35px; font-size: 1rem; }
+            .footer-columns { grid-template-columns: repeat(2, 1fr); }
+            .empty-state h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay" id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <header>
+        <a href="index.html" class="logo">ZEEOSKOP</a>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </header>
+
+    <!-- SIDEBAR MENU IDENTIK -->
+    <div class="sidebar-menu" id="sidebar-menu">
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+        <div id="sidebar-profile-section"></div>
+        
+        <div class="menu-links">
+            <a href="index.html">Beranda</a>
+            
+            <div class="accordion-item">
+                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;">
+                    Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
+                </a>
+                <div class="accordion-content" id="kategori-dropdown">
+                    <a href="#">Genre</a>
+                    <a href="#">Negara</a>
+                    <a href="#">Tahun</a>
+                    
+                    <a href="#" onclick="toggleAccordion('jelajahi-dropdown', 'icon-jelajahi'); return false;" style="color: #fff; font-weight: bold; margin-top: 5px;">
+                        Jelajahi <span class="arrow-icon" id="icon-jelajahi">▼</span>
+                    </a>
+                    <div class="accordion-content" id="jelajahi-dropdown" style="border-left: 1px solid #444; margin-left: 10px;">
+                        <a href="#">Terpopuler</a>
+                        <a href="#">Rating Tertinggi</a>
+                        <a href="#">Rekomendasi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Penanda Menu Aktif -->
+            <a href="favorit.html" style="color: #fff; border-left: 3px solid #d4af37; background: rgba(255,255,255,0.1); padding-left: 20px;">Film Favorit Saya</a>
+            
+            <a href="update.html">Notifikasi Baru</a>
+            <a href="vip.html">Paket Membership</a>
+            <a href="bantuan.html">Pusat Bantuan</a>
+        </div>
+        
+        <button class="auth-sidebar-btn" id="sidebar-auth-btn" onclick="handleAuthClick()">Masuk</button>
+    </div>
+
+    <!-- WRAPPER CONTENT -->
+    <div class="content-wrapper">
+        
+        <div class="page-header">
+            <h1>Daftar Favorit Saya</h1>
+        </div>
+
+        <!-- EMPTY STATE (Hanya muncul jika tidak ada film di dalam grid) -->
+        <div class="empty-state" id="empty-state">
+            <div class="empty-icon">🍿</div>
+            <h2>Daftar Favorit Kosong</h2>
+            <p>Sepertinya Anda belum menambahkan film apa pun ke dalam daftar ini. Mari jelajahi koleksi premium kami dan temukan tontonan favorit Anda.</p>
+            <button class="btn-explore" onclick="window.location.href='film.html'">Jelajahi Pustaka</button>
+        </div>
+
+        <!-- FAVORITES GRID -->
+        <div class="favorites-grid" id="favorites-grid">
+            
+            <!-- Poster 1 -->
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
+                <div class="poster-overlay">
+                    <span class="poster-title">Avenger: Secret Wars</span>
+                    <div class="poster-actions">
+                        <button class="btn-circle btn-play-mini" onclick="handlePlayClick('Avenger: Secret Wars')" title="Putar Sekarang">▶</button>
+                        <button class="btn-circle btn-remove-mini" onclick="removeFavorite(this, 'Avenger: Secret Wars')" title="Hapus dari Daftar">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Poster 2 -->
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600');">
+                <div class="poster-overlay">
+                    <span class="poster-title">Interstellar V2</span>
+                    <div class="poster-actions">
+                        <button class="btn-circle btn-play-mini" onclick="handlePlayClick('Interstellar V2')" title="Putar Sekarang">▶</button>
+                        <button class="btn-circle btn-remove-mini" onclick="removeFavorite(this, 'Interstellar V2')" title="Hapus dari Daftar">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Poster 3 -->
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600');">
+                <div class="poster-overlay">
+                    <span class="poster-title">Cyberpunk Neo Tokyo</span>
+                    <div class="poster-actions">
+                        <button class="btn-circle btn-play-mini" onclick="handlePlayClick('Cyberpunk Neo Tokyo')" title="Putar Sekarang">▶</button>
+                        <button class="btn-circle btn-remove-mini" onclick="removeFavorite(this, 'Cyberpunk Neo Tokyo')" title="Hapus dari Daftar">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Poster 4 -->
+            <div class="poster" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=600');">
+                <div class="poster-overlay">
+                    <span class="poster-title">Spirited Away Remastered</span>
+                    <div class="poster-actions">
+                        <button class="btn-circle btn-play-mini" onclick="handlePlayClick('Spirited Away Remastered')" title="Putar Sekarang">▶</button>
+                        <button class="btn-circle btn-remove-mini" onclick="removeFavorite(this, 'Spirited Away Remastered')" title="Hapus dari Daftar">✕</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER IDENTIK -->
+    <footer>
+        <div class="footer-call">Ada pertanyaan? Hubungi <a href="#">0800-1-ZEEOSKOP</a></div>
+        <div class="footer-columns">
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="index.html">Beranda</a>
+                <a href="film.html">Kategori Film</a>
+                <a href="#">Cara Menonton</a>
+                <a href="#">Resolusi & Format</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Akun Saya</a>
+                <a href="#">Pusat Media</a>
+                <a href="#">Ketentuan Penggunaan</a>
+            </div>
+            <div class="footer-col">
+                <h4>Help Center</h4>
+                <a href="#">Tanya Jawab</a>
+                <a href="bantuan.html">Pusat Bantuan</a>
+                <a href="#">Privasi Pengguna</a>
+                <a href="#">Hubungi Kami</a>
+            </div>
+        </div>
+        <div class="footer-brand">ZEEOSKOP</div>
+    </footer>
+
+    <!-- LOGIKA JAVASCRIPT UTAMA -->
+    <script>
+        let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
+        let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
+
+        // PROTEKSI: Daftar favorit adalah fitur privat.
+        if (!isLoggedIn) {
+            alert("Akses Terbatas. Anda harus masuk ke akun ZEEOSKOP terlebih dahulu.");
+            window.location.href = 'login.html';
+        }
+
+        // --- FUNGSI KLIK FILM (KEMBALI KE SEAMLESS INTERACTION) ---
+        function handlePlayClick(movieTitle) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+
+            if (mode === 'nobar') {
+                localStorage.setItem('zeeoskop_selected_movie_title', movieTitle);
+                window.location.href = 'nobar.html';
+            } else {
+                const generatedSoloId = 'ZSKP-SOLO-' + Math.floor(100 + Math.random() * 900);
+                window.location.href = `room.html?id=${generatedSoloId}`;
+            }
+        }
+
+        // --- FUNGSI HAPUS FILM DARI FAVORIT & CEK KOSONG ---
+        function removeFavorite(buttonElement, movieTitle) {
+            // Mencegah klik menembus ke bagian poster (event bubbling)
+            event.stopPropagation(); 
+            
+            const konfirmasi = confirm(`Hapus "${movieTitle}" dari Daftar Favorit Saya?`);
+            
+            if (konfirmasi) {
+                // Hapus elemen poster dari DOM
+                const posterElement = buttonElement.closest('.poster');
+                posterElement.style.transform = 'scale(0)';
+                posterElement.style.opacity = '0';
+                
+                // Beri waktu animasi untuk selesai sebelum menghapus node
+                setTimeout(() => {
+                    posterElement.remove();
+                    checkEmptyState();
+                }, 300);
+            }
+        }
+
+        function checkEmptyState() {
+            const grid = document.getElementById('favorites-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Jika tidak ada sisa elemen anak (poster) di dalam grid
+            if (grid.children.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+            }
+        }
+
+        // --- LOGIKA ACCORDION MENU SIDEBAR ---
+        function toggleAccordion(dropdownId, iconId) {
+            const dropdown = document.getElementById(dropdownId);
+            const icon = document.getElementById(iconId);
+            dropdown.classList.toggle('active');
+            icon.classList.toggle('rotate');
+        }
+
+        // --- KONTROL SIDEBAR & AUTH ---
+        function toggleMenu() {
+            document.getElementById('sidebar-menu').classList.toggle('active');
+            document.getElementById('menu-overlay').classList.toggle('active');
+            updateSidebarUI();
+        }
+
+        function updateSidebarUI() {
+            const profileSection = document.getElementById('sidebar-profile-section');
+            const authBtn = document.getElementById('sidebar-auth-btn');
+
+            if (isLoggedIn) {
+                profileSection.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-pic"></div>
+                        <div class="profile-info">
+                            <h4>${userName}</h4>
+                            <span>★ VIP Member</span>
+                        </div>
+                    </div>
+                `;
+                authBtn.innerText = "Keluar";
+                authBtn.className = "auth-sidebar-btn logout-btn";
+            }
+        }
+
+        function handleAuthClick() {
+            if (isLoggedIn) {
+                localStorage.removeItem('zeeoskop_loggedIn');
+                localStorage.removeItem('zeeoskop_user');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Jalankan pengecekan pertama kali halaman dimuat
+        updateSidebarUI();
+        checkEmptyState();
+    </script>
+</body>
+</html>
