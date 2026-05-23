@@ -133,11 +133,11 @@
 
     <div class="content-wrapper">
         <div class="search-container">
-            <input type="text" class="search-box" id="searchInput" placeholder="Cari judul film..." onkeyup="searchMovies(event)">
+            <input type="text" class="search-box" id="searchInput" placeholder="Cari judul film (Tekan Enter)..." onkeyup="searchMovies(event)">
         </div>
 
         <section class="row-section">
-            <h2 class="row-title">FILM POPULER SAAT INI</h2>
+            <h2 class="row-title" id="title-popular">FILM POPULER SAAT INI</h2>
             <div class="row-posters" id="row-popular">
                 <div class="loading-text">Sedang memuat tayangan dari server...</div>
             </div>
@@ -176,49 +176,74 @@
         if (!isLoggedIn) { window.location.href = 'login.html'; }
 
         // ==========================================
-        // KONFIGURASI API TMDB
+        // KONFIGURASI API TMDB & PROXY (ANTI BLOKIR)
         // ==========================================
-        // Perhatian: Ini menggunakan API Key TMDB public dummy/sementara untuk demo.
-        // Nanti kamu harus mengganti "YOUR_TMDB_API_KEY" dengan kunci gratis dari themoviedb.org
-        const TMDB_API_KEY = "8a25c6f059e0a8adbb2799c4c7c88b0a"; // Ganti ini nanti
+        const TMDB_API_KEY = "8a25c6f059e0a8adbb2799c4c7c88b0a"; // Pastikan ganti ini jika limit
         const TMDB_BASE_URL = "https://api.themoviedb.org/3";
         const IMG_BASE_URL = "https://image.tmdb.org/t/p/w500";
+        const PROXY_URL = "https://api.allorigins.win/get?url="; // Pintu Rahasia Tembus Blokir ISP
 
-        // Fungsi Menarik Film Populer
+        // Fungsi Pencarian Film (Baru Ditambahkan agar tidak Error)
+        async function searchMovies(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('searchInput').value;
+                if (!query) return;
+                
+                document.getElementById('title-popular').innerText = `HASIL PENCARIAN: ${query.toUpperCase()}`;
+                document.getElementById('row-popular').innerHTML = '<div class="loading-text">Mencari tayangan...</div>';
+
+                try {
+                    const targetUrl = encodeURIComponent(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&language=id-ID&query=${query}`);
+                    const response = await fetch(PROXY_URL + targetUrl);
+                    const dataRaw = await response.json();
+                    const data = JSON.parse(dataRaw.contents);
+                    renderMovies(data.results, 'row-popular');
+                } catch (error) {
+                    document.getElementById('row-popular').innerHTML = '<div class="loading-text" style="color:red;">Gagal mencari. Periksa koneksi internet.</div>';
+                }
+            }
+        }
+
+        // Fungsi Menarik Film Populer (Diperbaiki dengan Proxy)
         async function fetchPopularMovies() {
             try {
-                const response = await fetch(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}&language=id-ID`);
-                const data = await response.json();
+                const targetUrl = encodeURIComponent(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}&language=id-ID`);
+                const response = await fetch(PROXY_URL + targetUrl);
+                const dataRaw = await response.json();
+                const data = JSON.parse(dataRaw.contents);
                 renderMovies(data.results, 'row-popular');
             } catch (error) {
                 document.getElementById('row-popular').innerHTML = '<div class="loading-text" style="color:red;">Gagal memuat tayangan. Periksa koneksi internet.</div>';
             }
         }
 
-        // Fungsi Menarik Film Rating Tertinggi
+        // Fungsi Menarik Film Rating Tertinggi (Diperbaiki dengan Proxy)
         async function fetchTopRatedMovies() {
             try {
-                const response = await fetch(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=id-ID&page=1`);
-                const data = await response.json();
+                const targetUrl = encodeURIComponent(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=id-ID&page=1`);
+                const response = await fetch(PROXY_URL + targetUrl);
+                const dataRaw = await response.json();
+                const data = JSON.parse(dataRaw.contents);
                 renderMovies(data.results, 'row-top-rated');
             } catch (error) {
-                document.getElementById('row-top-rated').innerHTML = '<div class="loading-text" style="color:red;">Gagal memuat tayangan.</div>';
+                document.getElementById('row-top-rated').innerHTML = '<div class="loading-text" style="color:red;">Gagal memuat tayangan. Periksa koneksi internet.</div>';
             }
         }
 
-        // Fungsi Render HTML ke Layar
+        // Fungsi Render HTML ke Layar (Identik, menjaga logika TMDB ID untuk VidLink)
         function renderMovies(moviesArray, containerId) {
             const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Kosongkan text loading
+            container.innerHTML = ''; 
+
+            if (!moviesArray || moviesArray.length === 0) {
+                container.innerHTML = '<div class="loading-text">Tidak ada film ditemukan.</div>';
+                return;
+            }
 
             moviesArray.forEach(movie => {
-                // Hindari error jika film tidak punya gambar poster
                 if(!movie.poster_path) return;
 
-                // Hitung persen kecocokan asal-asalan dari rating
                 const matchPercent = Math.round(movie.vote_average * 10);
-                
-                // Judul rapi, hilangkan kutip agar tidak error saat di-klik
                 const safeTitle = movie.title.replace(/'/g, "");
 
                 const posterHTML = `
@@ -240,7 +265,6 @@
             fetchTopRatedMovies();
         });
 
-
         // ==========================================
         // LOGIKA UI BAWAAN
         // ==========================================
@@ -249,6 +273,7 @@
             document.getElementById(iconId).classList.toggle('rotate');
         }
 
+        // LOGIKA KLIK FILM: Sempurna untuk dikirim ke room.html (VidLink)
         function handleMovieClick(movieTitle, tmdbId) {
             const urlParams = new URLSearchParams(window.location.search);
             const mode = urlParams.get('mode');
