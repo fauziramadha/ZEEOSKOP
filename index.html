@@ -27,11 +27,19 @@
         .profile-info h4 { font-size: 1.1rem; color: #fff; }
         .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
 
-        .menu-links { display: flex; flex-direction: column; gap: 15px; flex: 1; margin-bottom: 30px; }
-        .menu-links a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .menu-links a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
+        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
         
-        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; }
+        /* CSS Accordion */
+        .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
+        .accordion-content.active { display: flex; }
+        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; text-decoration: none; display: block; transition: 0.2s;}
+        .accordion-content a:hover { color: #fff; border-left: 2px solid #e50914; padding-left: 15px; background: transparent; }
+        .arrow-icon { margin-left: auto; font-size: 0.8rem; transition: transform 0.3s; }
+        .arrow-icon.rotate { transform: rotate(180deg); color: #d4af37; }
+
+        .auth-sidebar-btn { background: #e50914; color: white; text-align: center; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 1rem; width: 100%; margin-top: 20px;}
         .logout-btn { background: transparent; border: 1px solid #777; color: #aaa; }
 
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; opacity: 0; transition: opacity 0.4s; }
@@ -71,14 +79,12 @@
         .row-posters { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 20px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none; }
         .row-posters::-webkit-scrollbar { display: none; }
         
-        /* Kartu Poster Bersih ala Netflix */
         .poster { 
             min-width: 160px; height: 240px; background-color: #222; border-radius: 4px; 
             cursor: pointer; transition: transform 0.3s ease; background-size: cover; 
             background-position: center; position: relative; overflow: hidden;
         }
         
-        /* Efek Hover Poster (Memunculkan Play & Judul) */
         .poster-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
@@ -91,7 +97,6 @@
         .play-icon { font-size: 2rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
         .poster-title { font-size: 0.8rem; font-weight: 800; color: #fff; letter-spacing: 1px; }
 
-        /* Tombol Selengkapnya */
         .btn-more-container { text-align: center; margin-top: 20px; }
         .btn-more {
             background: transparent; color: #fff; border: 1px solid #777;
@@ -144,7 +149,7 @@
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
     </header>
 
-    <!-- SIDEBAR MENU -->
+    <!-- SIDEBAR MENU DENGAN ACCORDION TERBARU -->
     <div class="sidebar-menu" id="sidebar-menu">
         <button class="close-btn" onclick="toggleMenu()">×</button>
         
@@ -152,11 +157,34 @@
 
         <div class="menu-links">
             <a href="index.html">Beranda</a>
-            <a href="film.html">Kategori Film</a>
+            
+            <!-- ACCORDION KATEGORI FILM -->
+            <div class="accordion-item">
+                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;">
+                    Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
+                </a>
+                
+                <div class="accordion-content" id="kategori-dropdown">
+                    <a href="#" onclick="alert('Memuat Daftar Genre...'); return false;">Genre</a>
+                    <a href="#" onclick="alert('Memuat Daftar Negara...'); return false;">Negara</a>
+                    <a href="#" onclick="alert('Memuat Daftar Tahun...'); return false;">Tahun</a>
+                    
+                    <!-- SUB-ACCORDION: JELAJAHI -->
+                    <a href="#" onclick="toggleAccordion('jelajahi-dropdown', 'icon-jelajahi'); return false;" style="color: #fff; font-weight: bold; margin-top: 5px;">
+                        Jelajahi <span class="arrow-icon" id="icon-jelajahi">▼</span>
+                    </a>
+                    
+                    <div class="accordion-content" id="jelajahi-dropdown" style="border-left: 1px solid #444; margin-left: 10px;">
+                        <a href="#">Terpopuler</a>
+                        <a href="#">Rating Tertinggi</a>
+                        <a href="#">Rekomendasi</a>
+                    </div>
+                </div>
+            </div>
+
             <a href="favorit.html">Film Favorit Saya</a>
             <a href="update.html">Notifikasi Baru</a>
             <a href="vip.html">Paket Membership</a>
-            <!-- Pengaturan Akun dihubungkan dengan Modal Profil -->
             <a href="#" onclick="openProfileModal(); return false;">Pengaturan Akun</a>
             <a href="bantuan.html">Pusat Bantuan</a>
         </div>
@@ -182,9 +210,9 @@
             <p class="hero-desc">Bukan sekadar berbagi layar. Ciptakan ruang bioskop eksklusifmu, undang penonton, dan pegang kendali penuh atas tontonan.</p>
             
             <div class="btn-group">
-                <!-- Jika login -> nobar.html, Jika belum -> modal login -->
+                <!-- Tombol Hero -->
                 <button class="btn btn-play" onclick="checkAuthAndRedirect('nobar.html')">Mulai Nobar</button>
-                <button class="btn btn-info" onclick="checkAuthAndRedirect('film.html')">Nonton Sendiri</button>
+                <button class="btn btn-info" onclick="checkAuthAndRedirect('film.html?mode=solo')">Nonton Sendiri</button>
             </div>
         </div>
     </section>
@@ -193,27 +221,28 @@
     <section class="row-section">
         <h2 class="row-title">Pilih Sumber Film</h2>
         <div class="row-posters">
-            <div class="poster" onclick="checkAuthAndRedirect('film.html')" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
+            <!-- Sekarang poster menggunakan fungsi promptWatchMode() -->
+            <div class="poster" onclick="promptWatchMode()" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
                 <div class="poster-overlay">
                     <span class="play-icon">▶</span><span class="poster-title">SERVER VIP</span>
                 </div>
             </div>
-            <div class="poster" onclick="checkAuthAndRedirect('film.html')" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=600');">
+            <div class="poster" onclick="promptWatchMode()" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=600');">
                 <div class="poster-overlay">
                     <span class="play-icon">▶</span><span class="poster-title">SERVER ASIA</span>
                 </div>
             </div>
-            <div class="poster" onclick="checkAuthAndRedirect('film.html')" style="background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=600');">
+            <div class="poster" onclick="promptWatchMode()" style="background-image: url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=600');">
                 <div class="poster-overlay">
                     <span class="play-icon">▶</span><span class="poster-title">SERVER GLOBAL</span>
                 </div>
             </div>
-            <div class="poster" onclick="checkAuthAndRedirect('film.html')" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600');">
+            <div class="poster" onclick="promptWatchMode()" style="background-image: url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600');">
                 <div class="poster-overlay">
                     <span class="play-icon">▶</span><span class="poster-title">SERVER ANIME</span>
                 </div>
             </div>
-            <div class="poster" onclick="checkAuthAndRedirect('film.html')" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=600');">
+            <div class="poster" onclick="promptWatchMode()" style="background-image: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=600');">
                 <div class="poster-overlay">
                     <span class="play-icon">▶</span><span class="poster-title">YOUTUBE API</span>
                 </div>
@@ -221,7 +250,7 @@
         </div>
 
         <div class="btn-more-container">
-            <button class="btn-more" onclick="checkAuthAndRedirect('film.html')">Selengkapnya</button>
+            <button class="btn-more" onclick="promptWatchMode()">Selengkapnya</button>
         </div>
     </section>
 
@@ -268,6 +297,22 @@
         </div>
     </div>
 
+    <!-- MODAL PILIH MODE NONTON -->
+    <div class="modal-overlay" id="watch-mode-modal">
+        <div class="modal-box text-center">
+            <button class="modal-close" onclick="closeModal('watch-mode-modal')">×</button>
+            <div style="font-size: 3rem; margin-bottom: 10px;">🍿</div>
+            <h2 style="color: #fff; margin-bottom: 15px; font-size: 1.5rem;">Pilih Mode Menonton</h2>
+            <p style="color: #a3a3a3; margin-bottom: 25px; line-height: 1.6; font-size: 0.95rem;">
+                Bagaimana Anda ingin menikmati tayangan ini? Buat ruang nobar bersama teman, atau nikmati waktu menonton sendirian.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="form-btn" style="margin-top: 0;" onclick="window.location.href='nobar.html'">Mulai Nobar</button>
+                <button class="form-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); margin-top: 0;" onclick="window.location.href='film.html?mode=solo'">Nonton Sendiri</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL EDIT PROFIL -->
     <div class="modal-overlay" id="profile-modal">
         <div class="modal-box text-center">
@@ -283,6 +328,14 @@
     <script>
         let isLoggedIn = localStorage.getItem('zeeoskop_loggedIn') === 'true';
         let userName = localStorage.getItem('zeeoskop_user') || 'Tamu';
+
+        // --- LOGIKA ACCORDION MENU ---
+        function toggleAccordion(dropdownId, iconId) {
+            const dropdown = document.getElementById(dropdownId);
+            const icon = document.getElementById(iconId);
+            dropdown.classList.toggle('active');
+            icon.classList.toggle('rotate');
+        }
 
         function toggleMenu() {
             document.getElementById('sidebar-menu').classList.toggle('active');
@@ -340,6 +393,15 @@
             }
         }
 
+        // Fungsi Memunculkan Pilihan Mode Nonton
+        function promptWatchMode() {
+            if (!isLoggedIn) {
+                openModal('login-alert-modal');
+            } else {
+                openModal('watch-mode-modal');
+            }
+        }
+
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -349,7 +411,6 @@
                 openModal('login-alert-modal');
                 return;
             }
-            // Jika sidebar terbuka, tutup dulu
             document.getElementById('sidebar-menu').classList.remove('active');
             document.getElementById('menu-overlay').classList.remove('active');
             
