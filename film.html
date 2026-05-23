@@ -27,13 +27,13 @@
         .profile-info span { font-size: 0.8rem; color: #d4af37; font-weight: bold; }
 
         .menu-links { display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 30px; }
-        .menu-links a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: flex-start; }
-        .menu-links > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
+        .menu-links > a, .accordion-item > a { color: #ccc; text-decoration: none; font-size: 1rem; font-weight: 600; transition: 0.3s; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: flex-start; cursor: pointer; }
+        .menu-links > a:hover, .accordion-item > a:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px; border-left: 3px solid #d4af37; }
         
         /* CSS Khusus Accordion Menu */
         .accordion-content { display: none; flex-direction: column; gap: 5px; padding-left: 15px; margin-top: 5px; margin-bottom: 10px; }
         .accordion-content.active { display: flex; }
-        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; }
+        .accordion-content a { font-size: 0.9rem; color: #999; padding: 8px 10px; text-decoration: none; transition: 0.2s; }
         .accordion-content a:hover { color: #fff; border-left: 2px solid #e50914; padding-left: 15px; background: transparent; }
         .arrow-icon { margin-left: auto; font-size: 0.8rem; transition: transform 0.3s; }
         .arrow-icon.rotate { transform: rotate(180deg); color: #d4af37; }
@@ -103,14 +103,13 @@
         <div class="menu-links">
             <a href="index.html">Beranda</a>
             
-            <!-- ACCORDION KATEGORI FILM -->
-            <div class="accordion-item">
-                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;">
+            <!-- ACCORDION KATEGORI FILM (Ditandai Aktif) -->
+            <div class="accordion-item" style="background: rgba(255,255,255,0.05); border-left: 3px solid #d4af37; border-radius: 8px;">
+                <a href="#" onclick="toggleAccordion('kategori-dropdown', 'icon-kategori'); return false;" style="color: #fff;">
                     Kategori Film <span class="arrow-icon" id="icon-kategori">▼</span>
                 </a>
                 
-                <div class="accordion-content" id="kategori-dropdown">
-                    <!-- Nanti disambung ke Scraper -->
+                <div class="accordion-content active" id="kategori-dropdown">
                     <a href="#" onclick="alert('Memuat Daftar Genre...'); return false;">Genre</a>
                     <a href="#" onclick="alert('Memuat Daftar Negara...'); return false;">Negara</a>
                     <a href="#" onclick="alert('Memuat Daftar Tahun...'); return false;">Tahun</a>
@@ -149,22 +148,22 @@
         <section class="row-section">
             <h2 class="row-title">SERVER 1 (VIP MOVIE)</h2>
             <div class="row-posters">
-                <!-- Logika Klik Cerdas ditanam pada fungsi onclick -->
-                <div class="poster" onclick="handleMovieClick('Avenger: Secret Wars')" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
+                <!-- Logika Klik Cerdas ditanam pada fungsi onclick dengan parameter TMDB ID -->
+                <div class="poster" onclick="handleMovieClick('Avenger: Secret Wars', '1005020')" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600');">
                     <div class="poster-overlay">
                         <span class="play-icon">▶</span><span class="poster-title">Avenger: Secret Wars</span>
                         <span class="poster-meta">98% COCOK</span>
                     </div>
                 </div>
-                <div class="poster" onclick="handleMovieClick('Avatar: The Deep Ocean')" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600');">
+                <div class="poster" onclick="handleMovieClick('Avatar: The Deep Ocean', '76600')" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600');">
                     <div class="poster-overlay">
                         <span class="play-icon">▶</span><span class="poster-title">Avatar: The Deep Ocean</span>
                         <span class="poster-meta">95% COCOK</span>
                     </div>
                 </div>
-                <div class="poster" onclick="handleMovieClick('Interstellar V2')" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600');">
+                <div class="poster" onclick="handleMovieClick('Interstellar', '157336')" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600');">
                     <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">Interstellar V2</span>
+                        <span class="play-icon">▶</span><span class="poster-title">Interstellar</span>
                         <span class="poster-meta">99% COCOK</span>
                     </div>
                 </div>
@@ -175,15 +174,15 @@
         <section class="row-section">
             <h2 class="row-title">SERVER 2 (ASIA & DRAMA)</h2>
             <div class="row-posters">
-                <div class="poster" onclick="handleMovieClick('The Raid 3: Redemption')" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600');">
+                <div class="poster" onclick="handleMovieClick('The Raid', '94329')" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=600');">
                     <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">The Raid 3: Redemption</span>
+                        <span class="play-icon">▶</span><span class="poster-title">The Raid</span>
                         <span class="poster-meta">92% COCOK</span>
                     </div>
                 </div>
-                <div class="poster" onclick="handleMovieClick('Cyberpunk Neo Tokyo')" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600');">
+                <div class="poster" onclick="handleMovieClick('Akira', '149')" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600');">
                     <div class="poster-overlay">
-                        <span class="play-icon">▶</span><span class="poster-title">Cyberpunk Neo Tokyo</span>
+                        <span class="play-icon">▶</span><span class="poster-title">Akira</span>
                         <span class="poster-meta">89% COCOK</span>
                     </div>
                 </div>
@@ -235,28 +234,24 @@
             const dropdown = document.getElementById(dropdownId);
             const icon = document.getElementById(iconId);
             
-            // Buka tutup menu
             dropdown.classList.toggle('active');
-            // Putar icon panah
             icon.classList.toggle('rotate');
         }
 
-        // --- 2. LOGIKA KLIK FILM CERDAS (SEAMLESS INTERACTION) ---
-        function handleMovieClick(movieTitle) {
-            // Kita cek parameter URL, apakah user dilempar dari mode "nobar" atau "solo"?
+        // --- 2. LOGIKA KLIK FILM DENGAN TRANSMISI ID TMDB ---
+        function handleMovieClick(movieTitle, tmdbId) {
             const urlParams = new URLSearchParams(window.location.search);
             const mode = urlParams.get('mode');
 
             if (mode === 'nobar') {
-                // Skenario A: User datang dari "Sumber Film" di nobar.html
-                // Simpan filmnya, lalu kembalikan ke nobar.html
+                // Mode Nobar: Simpan ke memori lalu kembali ke dashboard nobar
                 localStorage.setItem('zeeoskop_selected_movie_title', movieTitle);
+                localStorage.setItem('zeeoskop_selected_movie_id', tmdbId);
                 window.location.href = 'nobar.html';
             } else {
-                // Skenario B: User sedang asyik klik katalog biasa atau dari "Nonton Sendiri"
-                // Langsung generate ID acak dan lempar ke ruang bioskop langsung!
+                // Mode Nonton Sendiri: Lempar langsung ke room dengan ID ruangan & ID film
                 const generatedSoloId = 'ZSKP-SOLO-' + Math.floor(100 + Math.random() * 900);
-                window.location.href = `room.html?id=${generatedSoloId}`;
+                window.location.href = `room.html?id=${generatedSoloId}&tmdb=${tmdbId}`;
             }
         }
 
