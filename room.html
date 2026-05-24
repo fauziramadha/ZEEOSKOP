@@ -34,7 +34,8 @@
             z-index: 100;
         }
         
-        header h1 { font-size: 1.5rem; color: #d4af37; font-weight: 900; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        header h1 { font-size: 1.5rem; color: #d4af37; font-weight: 900; letter-spacing: 3px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin: 0;}
+        header a { text-decoration: none; }
         
         .room-badge { 
             background-color: rgba(255, 255, 255, 0.1); 
@@ -111,24 +112,21 @@
 <body>
 
     <header id="top-header">
-        <div class="logo">ZEEOSKOP</div>
+        <a href="film.html"><h1>ZEEOSKOP</h1></a>
         <div class="room-badge" onclick="copyRoomID()">
-            ROOM: <span id="room-id-display">ZSKP-998</span>
+            ROOM: <span id="room-id-display">Memuat...</span>
             <span id="copy-status" style="display:none; color:#46d369; margin-left:5px;">(Tersalin!)</span>
         </div>
     </header>
 
     <div class="main-container" id="cinema-container">
-        <!-- AREA VIDEO -->
         <div class="video-area">
             <div class="role-indicator">Sesi Premium Aktif</div>
 
             <div class="player-container">
-                <!-- IFRAME VIDLINK -->
-                <!-- Angka 1005020 di bawah ini nantinya akan diganti secara dinamis oleh JavaScript menggunakan ID TMDB -->
                 <iframe 
                     id="zeeoskop-player"
-                    src="https://vidlink.pro/movie/1005020" 
+                    src="" 
                     width="100%" 
                     height="100%" 
                     frameborder="0" 
@@ -142,7 +140,6 @@
             </div>
         </div>
 
-        <!-- AREA CHAT -->
         <div class="sidebar" id="chat-sidebar">
             <div class="user-list-section">
                 <div class="section-title">Status Ruangan</div>
@@ -157,7 +154,34 @@
         </div>
     </div>
 
-    <!-- SCRIPT UI & FULLSCREEN -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Tangkap param URL (contoh: ?id=SOLO-123&tmdb=157336)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tmdbId = urlParams.get('tmdb');
+            const roomId = urlParams.get('id');
+
+            // 2. Setel ID Room di pojok kanan atas
+            if(roomId) {
+                document.getElementById('room-id-display').innerText = roomId;
+            } else {
+                document.getElementById('room-id-display').innerText = "ZSKP-SOLO";
+            }
+
+            // 3. Pasang ID ke VidLink!
+            const player = document.getElementById('zeeoskop-player');
+            if (tmdbId) {
+                // Inilah kunci utama sistem ala MovieDex!
+                player.src = `https://vidlink.pro/movie/${tmdbId}`;
+            } else {
+                // Jika tidak ada ID, berikan peringatan atau tampilkan film default
+                console.warn("Tidak ada ID TMDB di URL!");
+                // Default ke Interstellar jika dibuka langsung
+                player.src = "https://vidlink.pro/movie/157336"; 
+            }
+        });
+    </script>
+
     <script>
         function copyRoomID() {
             const roomID = document.getElementById('room-id-display').innerText;
@@ -227,7 +251,6 @@
         }
     </script>
     
-    <!-- FIREBASE LIVE CHAT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -236,7 +259,6 @@
 
         async function initFirebase() {
             try {
-                // Di masa depan, ini memanggil API Vercel milikmu untuk menyembunyikan API Key
                 const response = await fetch('/api/config');
                 const firebaseConfig = await response.json();
                 const app = initializeApp(firebaseConfig);
