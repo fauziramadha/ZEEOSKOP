@@ -83,6 +83,7 @@
         @media (max-width: 768px) {
             .poster { min-width: 130px; height: 195px; }
             .footer-columns { grid-template-columns: repeat(2, 1fr); }
+            .search-container { max-width: 100%; }
         }
     </style>
 </head>
@@ -175,12 +176,10 @@
 
         // --- KONFIGURASI API ---
         const TMDB_API_KEY = "8a25c6f059e0a8adbb2799c4c7c88b0a";
-        // Menggunakan domain alternatif resmi tmdb.org yang kebal blokir ISP
         const TMDB_BASE_URL = "https://api.tmdb.org/3";
         const IMG_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
         // --- SISTEM PENYELAMAT OTOMATIS (FALLBACK) ---
-        // Jika internet memblokir API, data cadangan ini akan otomatis terisi dalam sekejap
         const fallbackMoviesData = [
             { id: 533535, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", vote_average: 8.5 },
             { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", vote_average: 8.3 },
@@ -205,7 +204,6 @@
                     const data = await response.json();
                     renderMovies(data.results, 'row-popular');
                 } catch (error) {
-                    // Jika diblokir, tetap tampilkan cadangan
                     renderMovies(fallbackMoviesData, 'row-popular');
                 }
             }
@@ -219,7 +217,6 @@
                 const data = await response.json();
                 renderMovies(data.results, 'row-popular');
             } catch (error) {
-                // Nol Stuck! Otomatis lempar ke cadangan jika diblokir
                 renderMovies(fallbackMoviesData, 'row-popular');
             }
         }
@@ -229,10 +226,8 @@
                 const response = await fetch(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&language=id-ID&page=1`);
                 if (!response.ok) throw new Error("Terblokir");
                 const data = await response.json();
-                // Potong data dari array agar beda dengan yang popular
                 renderMovies(data.results.slice(5, 15), 'row-top-rated');
             } catch (error) {
-                // Reverse array cadangan agar terlihat beda baris atas dan bawah
                 renderMovies([...fallbackMoviesData].reverse(), 'row-top-rated');
             }
         }
@@ -272,7 +267,7 @@
         });
 
 
-        // --- LOGIKA KLIK FILM MENUJU VIDLINK (SISTEM ID) ---
+        // --- LOGIKA KLIK FILM: SUDAH DISIAPKAN UNTUK MESIN MOVIEDEX ---
         function handleMovieClick(movieTitle, tmdbId) {
             const urlParams = new URLSearchParams(window.location.search);
             const mode = urlParams.get('mode');
@@ -282,6 +277,7 @@
                 localStorage.setItem('zeeoskop_selected_movie_id', tmdbId);
                 window.location.href = 'nobar.html';
             } else {
+                // Di sini letak keajaibannya: ID TMDB dikirim murni ke room.html
                 const generatedSoloId = 'ZSKP-SOLO-' + Math.floor(100 + Math.random() * 900);
                 window.location.href = `room.html?id=${generatedSoloId}&tmdb=${tmdbId}`;
             }
